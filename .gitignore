@@ -1,0 +1,42 @@
+## Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+
+## Build results
+bin/
+obj/
+out/
+Debug/
+Release/
+
+## ASP.NET Core
+wwwroot/dist/
+wwwroot/node_modules/
+
+## User-specific files
+*.rsuser
+*.sln.docstates
+
+## Logs
+*.log
+
+## OS-generated files
+.DS_Store
+Thumbs.db
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+
+## dotnet secrets
+**/secrets.json
+
+## EF Core migrations cache
+Migrations/*.Designer.cs
+Migrations/*ModelSnapshot.cs
