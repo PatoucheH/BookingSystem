@@ -1,27 +1,52 @@
-﻿@model IEnumerable<BookingSystem.Models.Properties>
+﻿@model BookingSystem.Models.ViewModels.PropertiesSearchViewModel
 
-<h2>Liste des Propriétés</h2>
+@{
+    ViewData["Title"] = "Accueil";
+}
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Location</th>
-            <th>Price</th>
-            <th>Type</th>
-            <th>Guest number</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var p in Model)
-        {
-            <tr>
-                <td>@p.Title</td>
-                <td>@p.Town, @p.Country</td>
-                <td>@p.Price</td>
-                <td>@p.Type</td>
-                <td>@p.GuestNbr</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<form asp-action="Index" method="post">
+    <div>
+        <div>
+            <input asp-for="Town" placeholder="City" />
+        </div>
+        <div>
+            <input asp-for="Country" placeholder="Country" />
+        </div>
+        <div>
+            <input asp-for="GuestNbr" placeholder="Guest" />
+        </div>
+        <div>
+            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertiesType>()" placeholder="Type">
+                <option value="">Type</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" >Search</button>
+        </div>
+    </div>
+</form>
+
+@if(Model.Results.Any())
+{
+    @foreach(var p in Model.Results)
+    {
+        <div>
+            <div>@if(!string.IsNullOrWhiteSpace(p.Photo))
+                {
+                    <img src="@p.Photo" alt="photo"/>
+                }else{
+                    <span>No Photo</span>
+                }
+            </div>
+            <div>@p.Title</div>
+            <div>@p.Town, @p.Country</div>
+            <div>@p.Description</div>
+            <span>@p.Price € / Day </span>
+            <span> Max guests : @p.GuestNbr </span>
+        </div>
+    }
+}
+else
+{
+    <p>No propriety match !</p>
+}
