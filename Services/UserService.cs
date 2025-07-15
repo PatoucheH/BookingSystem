@@ -12,9 +12,9 @@ namespace BookingSystem.Services
         Task<User> CreateUser(User user);
     }
 
-    public class UserService(ContextDatabase context) : IUserService
+    public class UserService(ApplicationDbContext context) : IUserService
     {
-        private readonly ContextDatabase _context = context;
+        private readonly ApplicationDbContext _context = context;
         
         public async Task<User?> GetUserByEmail(string email)
         {

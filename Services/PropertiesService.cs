@@ -13,9 +13,9 @@ namespace BookingSystem.Services
 
         Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO);
     }
-    public class PropertiesService(ContextDatabase context) : IPropertiesService
+    public class PropertiesService(ApplicationDbContext context) : IPropertiesService
     { 
-        private readonly ContextDatabase _context = context;
+        private readonly ApplicationDbContext _context = context;
         public async Task<IEnumerable<Properties>> GetAllProperties() 
         {
             return await _context.Properties.ToListAsync();

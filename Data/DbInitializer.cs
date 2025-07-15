@@ -5,7 +5,7 @@ namespace BookingSystem.Data
 {
     public class DbInitializer
     {
-        public static async Task Initialize(ContextDatabase context)
+        public static async Task Initialize(ApplicationDbContext context)
         {
             await context.Database.EnsureCreatedAsync();
 

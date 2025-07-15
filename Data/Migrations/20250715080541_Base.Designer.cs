@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BookingSystem.Data.Migrations
 {
-    [DbContext(typeof(ContextDatabase))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250715080541_Base")]
     partial class Base
     {

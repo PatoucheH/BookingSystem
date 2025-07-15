@@ -1,16 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BookingSystem.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BookingSystem.Data
 {
-    public class ContextDatabase : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
-        public ContextDatabase(DbContextOptions<ContextDatabase> options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public virtual DbSet<User> Users { get;set;}
         public virtual DbSet<Properties> Properties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(h => h.Id);
