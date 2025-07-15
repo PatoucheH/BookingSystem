@@ -7,14 +7,15 @@ namespace BookingSystem.Models
         internal int Id { get; set; }
         public string? Town { get; set; }
         public string? Country { get; set; }
+        public int? GuestNbr { get; set; }
         public PropertiesType Type { get; set; }
         public string? Description { get; set; }
         public string? Title { get; set; }
-        public int Price { get; set; }
+        public Double Price { get; set; }
         internal string? Photo { get; set; }
-        internal int HostId { get; set; }
+        internal int OwnerId { get; set; }
         [JsonIgnore]
-        internal virtual Owner? Owner { get; set; }
+        internal virtual User? Owner { get; set; }
 
     }
 }

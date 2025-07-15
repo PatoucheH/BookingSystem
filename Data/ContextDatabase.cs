@@ -6,27 +6,12 @@ namespace BookingSystem.Data
     public class ContextDatabase : DbContext
     {
         public ContextDatabase(DbContextOptions<ContextDatabase> options) : base(options) { }
-
-        public virtual DbSet<Guest> Guests { get; set; }
-        public virtual DbSet<Owner> Owners { get;set;}
+        public virtual DbSet<User> Users { get;set;}
         public virtual DbSet<Properties> Properties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Guest>(entity =>
-            {
-                entity.HasKey(g => g.Id);
-                entity.Property(g => g.Username)
-                    .IsRequired()
-                    .HasMaxLength(25);
-                entity.Property(g => g.Password)
-                    .IsRequired()
-                    .HasMaxLength(50);
-                entity.Property(g => g.Email)
-                    .HasMaxLength(150);
-            });
-
-            modelBuilder.Entity<Owner>(entity =>
+            modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(h => h.Id);
                 entity.Property(h => h.Username)
@@ -39,7 +24,7 @@ namespace BookingSystem.Data
                     .HasMaxLength(150);
                 entity.HasMany(h => h.Properties)
                     .WithOne(p => p.Owner)
-                    .HasForeignKey(p => p.HostId)
+                    .HasForeignKey(p => p.OwnerId)
                     ;
             });
 
@@ -65,9 +50,11 @@ namespace BookingSystem.Data
                     .HasMaxLength(250);
                 entity.HasOne(p => p.Owner)
                     .WithMany(h => h.Properties)
-                    .HasForeignKey(p => p .HostId)
+                    .HasForeignKey(p => p .OwnerId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+
         }
 
     }

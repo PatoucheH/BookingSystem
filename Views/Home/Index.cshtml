@@ -1,8 +1,23 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<h1>Book your dream  </h1>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@model IEnumerable<BookingSystem.Models.Properties>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Place</th>
+                <th>Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var property in Model)
+            {
+                <tr>
+                    <td>@property.Title</td>
+                    <td>@property.Country, @property.Town</td>
+                    <td>@property.Price € / jour</td>
+                </tr>
+            }
+        </tbody>
+    </table>
