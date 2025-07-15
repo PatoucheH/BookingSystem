@@ -9,6 +9,6 @@ namespace BookingSystem.Models.ViewModels
         public int? GuestNbr { get; set; }
         public PropertiesType? Type { get; set; }
 
-        public IEnumerable<PropertiesSearchDTO> Results { get; set; } = new List<PropertiesSearchDTO>();
+        public IEnumerable<PropertiesDTO> Results { get; set; } = new List<PropertiesDTO>();
     }
 }

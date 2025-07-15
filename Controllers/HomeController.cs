@@ -19,7 +19,7 @@ namespace BookingSystem.Controllers
             var properties = await _propertiesService.GetSearchProperties(null,null,null,null);
             var viewModel = new PropertiesSearchViewModel
             {
-                Results = (IEnumerable<Models.DTOs.PropertiesSearchDTO>)properties
+                Results = (IEnumerable<Models.DTOs.PropertiesDTO>)properties
             };
             return View(viewModel);
         }

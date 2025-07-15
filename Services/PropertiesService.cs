@@ -9,7 +9,9 @@ namespace BookingSystem.Services
     public interface IPropertiesService
     {
         Task<IEnumerable<Properties>> GetAllProperties();
-        Task<IEnumerable<PropertiesSearchDTO>> GetSearchProperties(string country, string town, int? guestNbr, PropertiesType? type);
+        Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, PropertiesType? type);
+
+        Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO);
     }
     public class PropertiesService(ContextDatabase context) : IPropertiesService
     { 
@@ -19,7 +21,7 @@ namespace BookingSystem.Services
             return await _context.Properties.ToListAsync();
         }
 
-        public async Task<IEnumerable<PropertiesSearchDTO>> GetSearchProperties(string country, string town, int? guestNbr, PropertiesType? type)
+        public async Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, PropertiesType? type)
         {
             var query = _context.Properties.AsQueryable();
             if (!string.IsNullOrWhiteSpace(country)) query = query.Where(p => p.Country == country);
@@ -27,8 +29,8 @@ namespace BookingSystem.Services
             if (guestNbr.HasValue && guestNbr.Value > 0) query = query.Where(p => p.GuestNbr >= guestNbr.Value);
             if (type.HasValue) query = query.Where(p => p.Type == type.Value);
 
-            var result =await query
-                .Select(p => new PropertiesSearchDTO
+            var result = await query
+                .Select(p => new PropertiesDTO
                 {
                     Price = p.Price,
                     Title = p.Title,
@@ -41,6 +43,26 @@ namespace BookingSystem.Services
                 })
                 .ToListAsync();
             return result;
+        }
+
+        public async Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO)
+        {
+            var properties = new Properties
+            {
+                Town = propertiesDTO.Town,
+                Country = propertiesDTO.Country,
+                GuestNbr = propertiesDTO.GuestNbr,
+                Type = propertiesDTO.Type,
+                Description = propertiesDTO.Description,
+                Title = propertiesDTO.Title,
+                Price = propertiesDTO.Price,
+                Photo = propertiesDTO.Photo,
+                OwnerId = 1
+            };
+
+            _context.Properties.Add(properties);
+            await _context.SaveChangesAsync();
+            return propertiesDTO;
         }
     }
 }

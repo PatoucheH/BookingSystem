@@ -1,0 +1,38 @@
+﻿@model BookingSystem.Models.DTOs.PropertiesDTO
+@{
+}
+
+<h2>Add a property</h2>
+<form asp-action="Index" method="post">
+    <div>
+        <div>
+            <input asp-for="Town" placeholder="City" />
+        </div>
+        <div>
+            <input asp-for="Country" placeholder="Country" />
+        </div>
+        <div>
+            <input asp-for="GuestNbr" placeholder="Guest" />
+        </div>
+        <div>
+            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertiesType>()" placeholder="Type">
+                <option value="">Type</option>
+            </select>
+        </div>
+        <div>
+            <input asp-for="Price" placeholder="Price per night" />
+        </div>
+        <div>
+            <input asp-for="Description" placeholder="Describe your location" />
+        </div>
+        <div>
+            <input asp-for="Title" placeholder="Name your location" />
+        </div>
+        <div>
+            <input asp-for="Photo" placeholder="Share the Url of your photo's location" />
+        </div>
+        <div>
+            <button type="submit">Add location</button>
+        </div>
+    </div>
+</form>
