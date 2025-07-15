@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingSystem.Data.Migrations
 {
     [DbContext(typeof(ContextDatabase))]
-    [Migration("20250714143126_Base")]
+    [Migration("20250715080541_Base")]
     partial class Base
     {
         /// <inheritdoc />
@@ -40,6 +40,9 @@ namespace BookingSystem.Data.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("GuestNbr")
+                        .HasColumnType("int");
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");

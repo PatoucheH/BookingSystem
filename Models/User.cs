@@ -7,6 +7,6 @@
         public string? Password { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
-        public Properties[]? Properties { get; set; } = [];
+        public List<Properties> Properties { get; set; } = [];
     }
 }

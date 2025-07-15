@@ -14,6 +14,7 @@ namespace BookingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPropertiesService, PropertiesService>();
             builder.Services.AddSwaggerGen(options =>
             {
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

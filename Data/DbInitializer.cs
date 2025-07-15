@@ -20,6 +20,8 @@ namespace BookingSystem.Data
                 new User { Username = "Antoine", Email = "Antoine@example.com", Role = "Guest" },
                 new User { Username = "Jordan", Email = "Jordan@example.com", Role = "Guest" }
             };
+            await context.Users.AddRangeAsync(users);
+            await context.SaveChangesAsync();
 
             var properties = new Properties[]
             {
@@ -31,9 +33,10 @@ namespace BookingSystem.Data
                     Description = "blablabla",
                     Title = "beautifull hotel",
                     Price = 150,
+                    GuestNbr = 2,
                     Photo = "URl",
-                    OwnerId = 1,
-                    Owner = users[0]
+                    OwnerId = users[0].Id,
+                    //Owner = users[0]
                 },
                 new Properties
                 {
@@ -43,13 +46,14 @@ namespace BookingSystem.Data
                     Description = "lololol",
                     Title = "awful hotel",
                     Price = 10,
+                    GuestNbr = 4,
                     Photo = "URl",
-                    OwnerId = 1,
-                    Owner = users[0]
+                    OwnerId = users[0].Id,
+                    //Owner = users[0]
                 }
             };
 
-            await context.Users.AddRangeAsync(users);
+            await context.Properties.AddRangeAsync(properties);
             await context.SaveChangesAsync();
         }
     }

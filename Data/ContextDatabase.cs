@@ -48,6 +48,8 @@ namespace BookingSystem.Data
                     .IsRequired();
                 entity.Property(p => p.Photo)
                     .HasMaxLength(250);
+                entity.Property(p => p.GuestNbr)
+                    .IsRequired();
                 entity.HasOne(p => p.Owner)
                     .WithMany(h => h.Properties)
                     .HasForeignKey(p => p .OwnerId)

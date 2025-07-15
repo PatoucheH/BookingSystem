@@ -1,32 +1,21 @@
-using System.Diagnostics;
-using BookingSystem.Models;
+﻿using BookingSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingSystem.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly PropertiesService? _propertiesService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IPropertiesService propertiesService)
         {
-            _logger = logger;
+            _propertiesService = (PropertiesService?)propertiesService;
         }
 
-        public IActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var properties = await _propertiesService.GetAllProperties();
+            return View(properties);
         }
     }
 }
