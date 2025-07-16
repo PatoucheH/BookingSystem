@@ -1,54 +1,62 @@
 ﻿@model BookingSystem.Models.ViewModels.PropertiesSearchViewModel
 
 @{
-    ViewData["Title"] = "Accueil";
+    ViewData["Title"] = "Home";
 }
-
-<h1 class="bg-sky">Patou</h1>
-
-<form asp-action="Index" method="post">
-    <div>
-        <div>
-            <input asp-for="Town" placeholder="City" />
-        </div>
-        <div>
-            <input asp-for="Country" placeholder="Country" />
-        </div>
-        <div>
-            <input asp-for="GuestNbr" placeholder="Guest" />
-        </div>
-        <div>
-            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertiesType>()" placeholder="Type">
-                <option value="">Type</option>
-            </select>
-        </div>
-        <div>
-            <button type="submit" >Search</button>
+<div class="mx-8 mb-8 px-8 pb-8">
+    <div class="flex justify-center m-8">
+        <div class="bg-green-400 rounded-full px-8 flex items-center justify-center ">
+            <form asp-action="Index" method="post" class="m-8">
+                <div class="flex flex-wrap gap-6 itesm-center">
+                        <input asp-for="Town" placeholder="City" class="p-2 border-bottom rounded w-40"/>
+                        <input asp-for="Country" placeholder="Country" class="p-2 border-bottom rounded w-40" />
+                        <input asp-for="GuestNbr" placeholder="Guest" class="p-2 border-bottom rounded w-32" />
+                        <input asp-for="Price" placeholder="Price" class="p-2 border-bottom rounded w-32" />
+                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertiesType>()" placeholder="Type"
+                            class="p-2 border rounded w-40">
+                            <option value="">Type</option>
+                        </select>
+                    <button type="submit" class="bg-white text-green-600 font-bold py-2 px-4 rounded transition duration-200 hover:scale-120">
+                            Search
+                        </button>
+                </div>
+            </form>
         </div>
     </div>
-</form>
 
-@if(Model.Results.Any())
-{
-    @foreach(var p in Model.Results)
+    @if(Model.Results.Any())
     {
-        <div>
-            <div>@if(!string.IsNullOrWhiteSpace(p.Photo))
-                {
-                    <img src="@p.Photo" alt="photo"/>
-                }else{
-                    <span>No Photo</span>
-                }
-            </div>
-            <div>@p.Title</div>
-            <div>@p.Town, @p.Country</div>
-            <div>@p.Description</div>
-            <span>@p.Price € / Day </span>
-            <span> Max guests : @p.GuestNbr </span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mx-8 mb-8">
+            @foreach (var p in Model.Results)
+            {
+                <a href="https://localhost:7120/@p.Title" class="block">
+                    <div class="container bg-green-400 border rounded-[50px] flex flex-col items-center justify-start mt-8 overflow-hidden h-[500px]">
+                        <div class="w-full h-[250px] bg-gray-600 rounded-t-[50px] flex items-center justify-center">
+                            @if (!string.IsNullOrWhiteSpace(p.Photo))
+                            {
+                                <img src="@p.Photo" alt="No photo" class="w-full h-full object-cover" />
+                            }
+                            else
+                            {
+                                <div class="w-full h-full flex items-center justify-center text-white text-lg font-semibold">
+                                    No Photo
+                                </div>
+                            }
+                        </div>
+                        <div class="m-2 text-center font-bold text-xl">@p.Title</div>
+                        <div class="m-2 text-center">@p.Town, @p.Country</div>
+                        <div class="m-2 text-center">@p.Description</div>
+                        <div class="m-2 text-center">
+                            <span>@p.Price € / Night</span><br />
+                            <span>Max guests: @p.GuestNbr</span>
+                        </div>
+                    </div>
+                </a>
+            }
         </div>
     }
-}
-else
-{
-    <p>No propriety match !</p>
-}
+    else
+    {
+        <p>No propriety match !</p>
+    }
+</div>

@@ -5,22 +5,22 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+        <li class="text-md font-bold transition duration-200 hover:scale-105 mr-6 mb-2">
+        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Check account @User.Identity?.Name !</a>
     </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+        <li class="text-md font-bold transition duration-200 hover:scale-105 mr-6 mb-2">
+        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button  type="submit">Logout</button>
         </form>
     </li>
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        <li class="text-md font-bold transition duration-200 hover:scale-105 mr-6 mb-2">
+        <a asp-area="Identity" asp-page="/Account/Register">Register</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        <li class="text-md font-bold transition duration-200 hover:scale-105 mr-6 mb-2">
+        <a asp-area="Identity" asp-page="/Account/Login">Login</a>
     </li>
 }
 </ul>
