@@ -47,6 +47,8 @@ namespace BookingSystem
                 await DbInitializer.Initialize(context);
             }
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthorization();

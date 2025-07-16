@@ -7,13 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Properties\serviceDependencies.json" />
-    <Content Include="Properties\serviceDependencies.local.json" />
-    <Content Include="tailwind.config.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Properties\serviceDependencies.local.json.user" />
+   <Content Include="tailwind.config.js" />
   </ItemGroup>
 
   <ItemGroup>
