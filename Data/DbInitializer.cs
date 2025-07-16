@@ -34,9 +34,8 @@ namespace BookingSystem.Data
                     Title = "beautifull hotel",
                     Price = 150,
                     GuestNbr = 2,
-                    Photo = "URl",
+                    Photo = "/css/assets/Patou_logo.png",
                     OwnerId = users[0].Id,
-                    //Owner = users[0]
                 },
                 new Properties
                 {
@@ -47,9 +46,8 @@ namespace BookingSystem.Data
                     Title = "awful hotel",
                     Price = 10,
                     GuestNbr = 4,
-                    Photo = "URl",
+                    Photo = "/css/assets/Patou_logo.png",
                     OwnerId = users[0].Id,
-                    //Owner = users[0]
                 }
             };
 

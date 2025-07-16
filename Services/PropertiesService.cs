@@ -9,7 +9,7 @@ namespace BookingSystem.Services
     public interface IPropertiesService
     {
         Task<IEnumerable<Properties>> GetAllProperties();
-        Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, PropertiesType? type);
+        Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, double? price, PropertiesType? type);
 
         Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO);
     }
@@ -21,12 +21,13 @@ namespace BookingSystem.Services
             return await _context.Properties.ToListAsync();
         }
 
-        public async Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, PropertiesType? type)
+        public async Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, double? price, PropertiesType? type)
         {
             var query = _context.Properties.AsQueryable();
             if (!string.IsNullOrWhiteSpace(country)) query = query.Where(p => p.Country == country);
             if (!string.IsNullOrWhiteSpace(town)) query = query.Where(p => p.Town == town);
             if (guestNbr.HasValue && guestNbr.Value > 0) query = query.Where(p => p.GuestNbr >= guestNbr.Value);
+            if (price.HasValue && price.Value > 0) query = query.Where(p => p.Price >= price.Value);
             if (type.HasValue) query = query.Where(p => p.Type == type.Value);
 
             var result = await query

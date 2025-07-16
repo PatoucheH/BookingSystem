@@ -20,7 +20,7 @@ namespace BookingSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var properties = await _propertiesService.GetSearchProperties(null, null, null, null);
+            var properties = await _propertiesService.GetSearchProperties(null, null, null, null, null);
             var viewModel = new PropertiesSearchViewModel
             {
                 Results = (IEnumerable<Models.DTOs.PropertiesDTO>)properties
@@ -50,6 +50,7 @@ namespace BookingSystem.Controllers
                 model.Country,
                 model.Town,
                 model.GuestNbr,
+                model.Price,
                 model.Type
             );
 
