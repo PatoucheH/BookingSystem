@@ -1,15 +1,10 @@
-# Node modules (npm/yarn/pnpm)
-node_modules/
 
 # Build output de Tailwind (si généré automatiquement)
-# wwwroot/lib/tailwind.css
-# wwwroot/lib/tailwind.min.css
 public/tailwind.css
 dist/
 build/
 
 # Fichiers de cache PostCSS ou Tailwind
-# .tailwindcss.*
 .postcss.*
 *.tmp
 

@@ -1,4 +1,9 @@
 ﻿@model BookingSystem.Models.ViewModels.PropertiesSearchViewModel
+@using Microsoft.AspNetCore.Identity
+@using BookingSystem.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 
 @{
     ViewData["Title"] = "Home";
@@ -23,6 +28,13 @@
             </form>
         </div>
     </div>
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+    {
+        <a class="btn btn-primary" asp-controller="Properties" asp-action="Create">
+            Ajouter une propriété
+        </a>
+    }
+
 
     @if(Model.Results.Any())
     {
