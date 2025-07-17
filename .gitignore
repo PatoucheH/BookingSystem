@@ -1,4 +1,3 @@
-
 # Build output de Tailwind (si généré automatiquement)
 public/tailwind.css
 dist/

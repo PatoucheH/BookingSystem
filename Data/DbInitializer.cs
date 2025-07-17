@@ -10,8 +10,6 @@ namespace BookingSystem.Data
         {
             await context.Database.MigrateAsync();
 
-            Console.WriteLine("📦 Migration terminée");
-
             string[] roles = new[] { "Admin", "Owner", "Guest" };
 
             foreach(var role in roles)
@@ -21,10 +19,9 @@ namespace BookingSystem.Data
 
             if(!await userManager.Users.AnyAsync())
             {
-                Console.WriteLine("👤 Création des utilisateurs...");
                 var user1 = new ApplicationUser
                 {
-                    UserName = "hugo.admin",
+                    UserName = "hugo@admin.com",
                     Email = "hugo@admin.com",
                     EmailConfirmed = true
                 };

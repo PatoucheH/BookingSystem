@@ -11,7 +11,7 @@ namespace BookingSystem.Services
         Task<IEnumerable<Properties>> GetAllProperties();
         Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, double? price, PropertiesType? type);
 
-        Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO);
+        Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO, string userId);
     }
     public class PropertiesService(ApplicationDbContext context) : IPropertiesService
     { 
@@ -27,7 +27,7 @@ namespace BookingSystem.Services
             if (!string.IsNullOrWhiteSpace(country)) query = query.Where(p => p.Country == country);
             if (!string.IsNullOrWhiteSpace(town)) query = query.Where(p => p.Town == town);
             if (guestNbr.HasValue && guestNbr.Value > 0) query = query.Where(p => p.GuestNbr >= guestNbr.Value);
-            if (price.HasValue && price.Value > 0) query = query.Where(p => p.Price >= price.Value);
+            if (price.HasValue && price.Value > 0) query = query.Where(p => p.Price <= price.Value);
             if (type.HasValue) query = query.Where(p => p.Type == type.Value);
 
             var result = await query
@@ -46,8 +46,9 @@ namespace BookingSystem.Services
             return result;
         }
 
-        public async Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO)
+        public async Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO, string userId)
         {
+            if (string.IsNullOrEmpty(userId)) throw new UnauthorizedAccessException("User not connected !");
             var properties = new Properties
             {
                 Town = propertiesDTO.Town,
@@ -58,7 +59,7 @@ namespace BookingSystem.Services
                 Title = propertiesDTO.Title,
                 Price = propertiesDTO.Price,
                 Photo = propertiesDTO.Photo,
-                OwnerId = "1"
+                OwnerId = userId
             };
 
             _context.Properties.Add(properties);
