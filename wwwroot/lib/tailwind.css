@@ -137,9 +137,9 @@
 1. Use a consistent sensible line-height in all browsers.
 2. Prevent adjustments of font size after orientation changes in iOS.
 3. Use a more readable tab size.
-4. Use the ApplicationUser's configured `sans` font-family by default.
-5. Use the ApplicationUser's configured `sans` font-feature-settings by default.
-6. Use the ApplicationUser's configured `sans` font-variation-settings by default.
+4. Use the user's configured `sans` font-family by default.
+5. Use the user's configured `sans` font-feature-settings by default.
+6. Use the user's configured `sans` font-variation-settings by default.
 7. Disable tap highlights on iOS
 */
 
@@ -166,7 +166,7 @@ html,
 
 /*
 1. Remove the margin in all browsers.
-2. Inherit line-height from `html` so ApplicationUsers can set them as a class directly on the `html` element.
+2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
 */
 
 body {
@@ -233,9 +233,9 @@ strong {
 }
 
 /*
-1. Use the ApplicationUser's configured `mono` font-family by default.
-2. Use the ApplicationUser's configured `mono` font-feature-settings by default.
-3. Use the ApplicationUser's configured `mono` font-variation-settings by default.
+1. Use the user's configured `mono` font-family by default.
+2. Use the user's configured `mono` font-feature-settings by default.
+3. Use the user's configured `mono` font-variation-settings by default.
 4. Correct the odd `em` font sizing in all browsers.
 */
 
@@ -483,7 +483,7 @@ textarea {
 
 /*
 1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
-2. Set the default placeholder color to the ApplicationUser's configured gray 400 color.
+2. Set the default placeholder color to the user's configured gray 400 color.
 */
 
 input::-moz-placeholder, textarea::-moz-placeholder {
@@ -775,6 +775,11 @@ video {
 
 .border {
   border-width: 1px;
+}
+
+.bg-emerald-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(236 253 245 / var(--tw-bg-opacity, 1));
 }
 
 .bg-gray-600 {

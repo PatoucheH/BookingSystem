@@ -30,7 +30,7 @@
             @foreach (var p in Model.Results)
             {
                 <a href="https://localhost:7120/@p.Title" class="block">
-                    <div class="container bg-green-400 border rounded-[50px] flex flex-col items-center justify-start mt-8 overflow-hidden h-[500px]">
+                    <div class="container bg-green-400 rounded-[50px] flex flex-col items-center justify-start mt-8 overflow-hidden h-[500px]">
                         <div class="w-full h-[250px] bg-gray-600 rounded-t-[50px] flex items-center justify-center">
                             @if (!string.IsNullOrWhiteSpace(p.Photo))
                             {
