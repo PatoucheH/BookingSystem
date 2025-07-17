@@ -58,7 +58,7 @@ namespace BookingSystem.Services
                 Title = propertiesDTO.Title,
                 Price = propertiesDTO.Price,
                 Photo = propertiesDTO.Photo,
-                OwnerId = 1
+                OwnerId = "1"
             };
 
             _context.Properties.Add(properties);

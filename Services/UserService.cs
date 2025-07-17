@@ -1,37 +1,45 @@
 ﻿using BookingSystem.Data;
 using BookingSystem.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace BookingSystem.Services
 {
     public interface IUserService
     {
-        Task<User?> GetUserByEmail(string email);
-        Task<IEnumerable<User>> GetAllUsers();
-        Task<User> CreateUser(User user);
+        Task<ApplicationUser?> GetUserByEmail(string email);
+        Task<IEnumerable<ApplicationUser>> GetAllUsers();
+        Task<ApplicationUser> CreateUser(ApplicationUser user, string password);
     }
 
-    public class UserService(ApplicationDbContext context) : IUserService
+    public class UserService : IUserService
     {
-        private readonly ApplicationDbContext _context = context;
-        
-        public async Task<User?> GetUserByEmail(string email)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public UserService(UserManager<ApplicationUser> userManager)
         {
-            return await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            _userManager = userManager;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsers()
+        public async Task<ApplicationUser?> GetUserByEmail(string email)
         {
-            return await _context.Users.ToListAsync();
+            return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsers()
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            return await _userManager.Users.ToListAsync();
+        }
+
+        public async Task<ApplicationUser> CreateUser(ApplicationUser user, string password)
+        {
+            var result = await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Échec de la création de l'utilisateur : {errors}");
+            }
             return user;
         }
     }
-
 }

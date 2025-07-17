@@ -1,11 +1,10 @@
 using BookingSystem.Data;
+using BookingSystem.Models;
 using BookingSystem.Services;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Text;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookingSystem
 {
@@ -15,53 +14,64 @@ namespace BookingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IPropertiesService, PropertiesService>();
+            // Connexion � la base de donn�es
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-            // add db context
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
+
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            // Enregistrement de l'Identity avec r�les
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            //  Enregistrement des services personnalis�s
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPropertiesService, PropertiesService>();
+            builder.Services.AddTransient<IEmailSender, FakeEmailSender>();
+
+            //MVC & Razor Pages
             builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages();
 
             var app = builder.Build();
 
+            //  Middleware
             if (!app.Environment.IsDevelopment())
             {
-                app.UseMigrationsEndPoint();
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
             else
             {
-                app.UseHsts();
+                app.UseMigrationsEndPoint();
             }
 
-            // Initialize Seeds 
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                var context = services.GetRequiredService<ApplicationDbContext>();
-                await DbInitializer.Initialize(context);
-            }
+            // Initialisation de la base
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var services = scope.ServiceProvider;
+            //    var context = services.GetRequiredService<ApplicationDbContext>();
+            //    await DbInitializer.Initialize(context);
+            //}
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication(); 
             app.UseAuthorization();
 
-            app.MapStaticAssets();
-
+            // Routage
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            app.MapRazorPages()
-                .WithStaticAssets();
+            app.MapRazorPages();
 
             app.Run();
         }
