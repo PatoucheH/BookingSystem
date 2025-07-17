@@ -14,7 +14,7 @@ namespace BookingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Connexion � la base de donn�es
+            // Connexion à la base de données
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -23,12 +23,12 @@ namespace BookingSystem
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            // Enregistrement de l'Identity avec r�les
+            // Enregistrement de l'Identity avec roles
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            //  Enregistrement des services personnalis�s
+            //  Enregistrement des services personnalisés
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPropertiesService, PropertiesService>();
             builder.Services.AddTransient<IEmailSender, FakeEmailSender>();
@@ -51,12 +51,16 @@ namespace BookingSystem
             }
 
             // Initialisation de la base
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var services = scope.ServiceProvider;
-            //    var context = services.GetRequiredService<ApplicationDbContext>();
-            //    await DbInitializer.Initialize(context);
-            //}
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                await DbInitializer.Initialize(context, userManager, roleManager);
+            }
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

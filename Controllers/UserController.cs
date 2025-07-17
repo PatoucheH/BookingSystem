@@ -22,7 +22,5 @@ namespace BookingSystem.Controllers
             var users = await _userService.GetAllUsers();
             return View(users);
         }
-
-
     }
 }
