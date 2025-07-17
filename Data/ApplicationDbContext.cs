@@ -4,32 +4,14 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BookingSystem.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-        public virtual DbSet<User> Users { get;set;}
         public virtual DbSet<Properties> Properties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(h => h.Id);
-                entity.Property(h => h.Username)
-                    .IsRequired()
-                    .HasMaxLength(25);
-                entity.Property(h => h.Password)
-                    .IsRequired()
-                    .HasMaxLength(50);
-                entity.Property(h => h.Email)
-                    .HasMaxLength(150);
-                entity.HasMany(h => h.Properties)
-                    .WithOne(p => p.Owner)
-                    .HasForeignKey(p => p.OwnerId)
-                    ;
-            });
-
             modelBuilder.Entity<Properties>(entity =>
             {
                 entity.HasKey(p => p.Id);

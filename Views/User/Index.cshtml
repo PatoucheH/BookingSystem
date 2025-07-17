@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BookingSystem.Models.User> 
+﻿@model IEnumerable<BookingSystem.Models.ApplicationUser> 
 
 <h2>Liste des utilisateurs</h2>
 
@@ -7,16 +7,14 @@
         <tr>
             <th>Nom</th>
             <th>Email</th>
-            <th>Rôle</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var user in Model)
         {
             <tr>
-                <td>@user.Username</td>
+                <td>@user.UserName</td>
                 <td>@user.Email</td>
-                <td>@user.Role</td>
             </tr>
         }
     </tbody>

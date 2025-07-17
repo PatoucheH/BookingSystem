@@ -13,9 +13,9 @@ namespace BookingSystem.Models
         public string? Title { get; set; }
         public Double Price { get; set; }
         internal string? Photo { get; set; }
-        internal int OwnerId { get; set; }
+        internal string? OwnerId { get; set; }
         [JsonIgnore]
-        internal virtual User? Owner { get; set; }
+        internal virtual ApplicationUser? Owner { get; set; }
 
     }
 }

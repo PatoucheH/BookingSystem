@@ -9,7 +9,7 @@ dist/
 build/
 
 # Fichiers de cache PostCSS ou Tailwind
-.tailwindcss.*
+# .tailwindcss.*
 .postcss.*
 *.tmp
 
