@@ -1,41 +1,72 @@
-# Build output de Tailwind (si généré automatiquement)
-public/tailwind.css
-dist/
-build/
+# =========================
+# ASP.NET Core + Tailwind
+# =========================
 
-# Fichiers de cache PostCSS ou Tailwind
-.postcss.*
-*.tmp
-
-## Visual Studio
-.vs/
-.vscode/
-*.user
-*.suo
-
-## Build results
+# Build output
 bin/
 obj/
 out/
 Debug/
 Release/
 
-## ASP.NET Core
+# wwwroot (si fichiers générés automatiquement)
+wwwroot/css/
+wwwroot/js/
 wwwroot/dist/
+wwwroot/build/
 wwwroot/node_modules/
+wwwroot/lib/
 
-## User-specific files
+# Tailwind/PostCSS
+tailwind.config.js
+tailwind.config.ts
+postcss.config.js
+postcss.config.ts
+*.tmp
+*.temp
+.cache/
+
+# Node.js / npm / Yarn
+node_modules/
+package-lock.json
+yarn.lock
+
+# LibMan (Library Manager)
+libman.json
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# Logs & coverage
+*.log
+TestResults/
+coverage/
+coverage*.json
+lcov.info
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.test
+
+# User-specific files
 *.rsuser
 *.sln.docstates
 
-## Logs
-*.log
-
-## OS-generated files
-.DS_Store
-Thumbs.db
-
-## NuGet
+# NuGet
 *.nupkg
 *.snupkg
 .nuget/
@@ -43,9 +74,13 @@ packages/
 project.lock.json
 project.fragment.lock.json
 
-## dotnet secrets
-**/secrets.json
-
-## EF Core migrations cache
+# EF Core Migrations (générés automatiquement)
 Migrations/*.Designer.cs
 Migrations/*ModelSnapshot.cs
+
+# Secrets
+**/secrets.json
+
+# OS files
+.DS_Store
+Thumbs.db
