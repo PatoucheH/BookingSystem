@@ -1,4 +1,9 @@
 ﻿@model BookingSystem.Models.ViewModels.PropertiesSearchViewModel
+@using Microsoft.AspNetCore.Identity
+@using BookingSystem.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 
 @{
     ViewData["Title"] = "Home";
@@ -16,13 +21,23 @@
                             class="p-2 border rounded w-40">
                             <option value="">Type</option>
                         </select>
-                    <button type="submit" class="bg-white text-green-600 font-bold py-2 px-4 rounded transition duration-200 hover:scale-120">
+                    <button type="submit" class="bg-white text-green-600 font-bold py-0 px-4 rounded transition duration-200 hover:scale-120">
                             Search
-                        </button>
+                        </button> 
                 </div>
             </form>
         </div>
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+    {   <div class="ml-8 flex items-center">
+            <a asp-controller="Form" asp-action="Index"
+               class="bg-green-500 text-white font-bold py-4 px-8 rounded-full whitespace-nowrap hover:scale-105 transition duration-200"
+               style="min-width: 100px;">
+                Add a property
+            </a>
     </div>
+    }
+    </div>
+
 
     @if(Model.Results.Any())
     {
