@@ -1,26 +1,39 @@
 ﻿using BookingSystem.Data;
-using BookingSystem.Services;
 using BookingSystem.Models;
 using BookingSystem.Models.DTOs;
-using Microsoft.AspNetCore.Mvc;
+using BookingSystem.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 
 namespace BookingSystem.Controllers
 {
     public class UserController: Controller
     {
-        private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserController(IUserService userService)
+        public UserController(UserManager<ApplicationUser> userManager)
         {
-            _userService = userService;
+            _userManager = userManager;
         }
 
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
-            var users = await _userService.GetAllUsers();
-            return View(users);
+            var users = _userManager.Users.ToList();
+            var userRolesViewModel = new List<UserDTO>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRolesViewModel.Add(new UserDTO
+                {
+                    Username = user.UserName,
+                    Email = user.Email,
+                    Roles = roles
+                });
+            }
+            return View(userRolesViewModel);
         }
     }
 }

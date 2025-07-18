@@ -1,21 +1,49 @@
-﻿@model IEnumerable<BookingSystem.Models.ApplicationUser> 
+﻿@model IEnumerable<BookingSystem.Models.DTOs.UserDTO>
 
-<h2>Liste des utilisateurs</h2>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Email</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
+@functions {
+    string GetBadgeClass(string role)
+    {
+        return role switch
         {
-            <tr>
-                <td>@user.UserName</td>
-                <td>@user.Email</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            "Admin" => "bg-red-100 text-red-800 border-red-300",
+            "Owner" => "bg-yellow-100 text-yellow-800 border-yellow-300",
+            "Guest" => "bg-blue-100 text-blue-800 border-blue-300",
+            _ => "bg-gray-100 text-gray-800 border-gray-300"
+        };
+    }
+}
+
+
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-xl min-w-lg mx-auto">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">List of all the users</h2>
+            <table class="table-auto border-collapse border border-gray-400 w-full">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-400 px-4 py-2">Username</th>
+                        <th class="border border-gray-400 px-4 py-2">Email</th>
+                        <th class="border border-gray-400 px-4 py-2">Roles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2">@user.Username</td>
+                            <td class="border border-gray-300 px-4 py-2">@user.Email</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                @foreach (var role in user.Roles)
+                                {
+                                    <span class="inline-block text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full border @GetBadgeClass(role)">
+                                        @role
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
