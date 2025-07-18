@@ -2,11 +2,14 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
-    <div class="col-md-3">
+<div>
+    <div class="p-12 flex justify-center">
         @await Html.PartialAsync("_ManageMenu")
     </div>
-    <div class="col-md-9">
+
+    <div>
         @RenderBody()
     </div>
 </div>
+
+@RenderSection("Scripts", required: false)

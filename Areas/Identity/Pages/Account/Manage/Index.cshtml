@@ -1,25 +1,19 @@
 ﻿@page
-@model PersonalDataModel
 @{
     ViewData["Title"] = "Personal Data";
     Layout = "_ManageLayout";
 }
 
-<h3>@ViewData["Title"]</h3>
+<div class="flex flex-col justify-center items-center px-6 text-center space-y-6 max-w-3xl mx-auto mt-8">
+    <h3 class="text-3xl font-semibold text-green-800">@ViewData["Title"]</h3>
 
-<div class="row">
-    <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
-        <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
-        </p>
-        <form id="download-data" asp-page="DownloadPersonalData" method="post">
-            <button class="btn btn-primary" type="submit">Download</button>
-        </form>
-        <p>
-            <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger">Delete</a>
-        </p>
-    </div>
+    <p class="text-gray-700 text-lg">
+        Your account contains personal data that you have given us. This page allows you to watch or delete that data.
+    </p>
+
+    <p class="text-red-700 font-semibold text-lg">
+        Deleting this data will permanently remove your account, and this cannot be recovered.
+    </p>
 </div>
 
 @section Scripts {
