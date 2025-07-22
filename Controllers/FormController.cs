@@ -18,6 +18,7 @@ namespace BookingSystem.Controllers
             _propertyService = (PropertyService?)propertyService;
         }
 
+        [Authorize(Roles = "Admin,Owner")]
         [HttpGet]
         public IActionResult Index()
         {

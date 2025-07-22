@@ -98,6 +98,10 @@ namespace BookingSystem.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            [Required]
+            [Display(Name = "Role")]
+            public string Role { get; set; }
+
         }
 
 
@@ -111,25 +115,37 @@ namespace BookingSystem.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
-                var ApplicationUser = CreateApplicationUser();
+                var applicationUser = CreateApplicationUser();
 
-                await _ApplicationUserStore.SetUserNameAsync(ApplicationUser, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(ApplicationUser, Input.Email, CancellationToken.None);
-                var result = await _ApplicationUserManager.CreateAsync(ApplicationUser, Input.Password);
+                await _ApplicationUserStore.SetUserNameAsync(applicationUser, Input.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(applicationUser, Input.Email, CancellationToken.None);
+
+                var result = await _ApplicationUserManager.CreateAsync(applicationUser, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("ApplicationUser created a new account with password.");
+                    _logger.LogInformation("User created a new account with password.");
 
-                    var ApplicationUserId = await _ApplicationUserManager.GetUserIdAsync(ApplicationUser);
-                    var code = await _ApplicationUserManager.GenerateEmailConfirmationTokenAsync(ApplicationUser);
+                    if (!string.IsNullOrEmpty(Input.Role))
+                    {
+                        var roleExists = await _ApplicationUserManager.IsInRoleAsync(applicationUser, Input.Role);
+                        if (!roleExists)
+                        {
+                            await _ApplicationUserManager.AddToRoleAsync(applicationUser, Input.Role);
+                        }
+                    }
+
+                    var userId = await _ApplicationUserManager.GetUserIdAsync(applicationUser);
+                    var code = await _ApplicationUserManager.GenerateEmailConfirmationTokenAsync(applicationUser);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
-                        values: new { area = "Identity", ApplicationUserId = ApplicationUserId, code = code, returnUrl = returnUrl },
+                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
@@ -141,19 +157,20 @@ namespace BookingSystem.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(ApplicationUser, isPersistent: false);
+                        await _signInManager.SignInAsync(applicationUser, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
                 }
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
+
 
         private ApplicationUser CreateApplicationUser()
         {

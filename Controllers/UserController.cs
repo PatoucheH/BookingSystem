@@ -17,7 +17,7 @@ namespace BookingSystem.Controllers
         {
             _userManager = userManager;
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var users = _userManager.Users.ToList();

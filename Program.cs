@@ -25,6 +25,7 @@ namespace BookingSystem
 
             // Enregistrement de l'Identity avec roles
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -33,6 +34,12 @@ namespace BookingSystem
             builder.Services.AddScoped<IPropertyService, PropertyService>();
             builder.Services.AddTransient<IEmailSender, FakeEmailSender>();
             builder.Services.AddScoped<PropertyService>();
+
+            // Configure redirection when access denied 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            });
 
 
             //MVC & Razor Pages

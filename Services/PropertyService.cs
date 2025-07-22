@@ -73,5 +73,23 @@ namespace BookingSystem.Services
         {
             return await _context.Properties.FirstOrDefaultAsync(p => p.Id == id);
         }
+        public async Task<PropertyDTO?> GetPropertyDTOById(int id)
+        {
+            return await _context.Properties
+                .Where(p => p.Id == id)
+                .Select(p => new PropertyDTO
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Country = p.Country,
+                    Town = p.Town,
+                    Price = p.Price,
+                    GuestNbr = p.GuestNbr,
+                    Description = p.Description,
+                    Photo = p.Photo,
+                    Type = p.Type
+                })
+                .FirstOrDefaultAsync();
+        }
     }
 }
