@@ -30,8 +30,10 @@ namespace BookingSystem
 
             //  Enregistrement des services personnalisés
             builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IPropertiesService, PropertiesService>();
+            builder.Services.AddScoped<IPropertyService, PropertyService>();
             builder.Services.AddTransient<IEmailSender, FakeEmailSender>();
+            builder.Services.AddScoped<PropertyService>();
+
 
             //MVC & Razor Pages
             builder.Services.AddControllersWithViews();

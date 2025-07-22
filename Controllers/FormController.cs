@@ -11,27 +11,27 @@ namespace BookingSystem.Controllers
 {
     public class FormController : Controller
     {
-        private readonly PropertiesService? _propertyService;
+        private readonly PropertyService? _propertyService;
 
-        public FormController(IPropertiesService? propertyService)
+        public FormController(IPropertyService? propertyService)
         {
-            _propertyService = (PropertiesService?)propertyService;
+            _propertyService = (PropertyService?)propertyService;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            return View(new PropertiesDTO());
+            return View(new PropertyDTO());
         }
 
         [Authorize(Roles = "Admin, Owner")]
         [HttpPost]
-        public async Task<IActionResult> Index([FromForm] PropertiesDTO properties)
+        public async Task<IActionResult> Index([FromForm] PropertyDTO property)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
 
-            await _propertyService.CreateProperties(properties, userId);
+            await _propertyService.CreateProperty(property, userId);
             return RedirectToAction("Index", "Home");
         }
     }

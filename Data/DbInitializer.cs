@@ -38,13 +38,13 @@ namespace BookingSystem.Data
                 await userManager.AddToRoleAsync(user1, "Admin");
                 await userManager.AddToRoleAsync(user2, "Admin");
 
-                var properties = new Properties[]
+                var properties = new Property[]
                 {
-                     new Properties
+                     new Property
                     {
                         Town = "Bx",
                         Country = "Belgium",
-                        Type = PropertiesType.Hotel,
+                        Type = PropertyType.Hotel,
                         Description = "blablabla",
                         Title = "Beautiful hotel",
                         Price = 150,
@@ -52,11 +52,11 @@ namespace BookingSystem.Data
                         Photo = "/css/assets/Patou_logo.png",
                         OwnerId = user1.Id
                     },
-                    new Properties
+                    new Property
                     {
                         Town = "Charlouz",
                         Country = "Belgium",
-                        Type = PropertiesType.Hotel,
+                        Type = PropertyType.Hotel,
                         Description = "lololol",
                         Title = "Awful hotel",
                         Price = 10,

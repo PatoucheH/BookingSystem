@@ -1,6 +1,6 @@
 ﻿namespace BookingSystem.Models
 {
-    public enum PropertiesType
+    public enum PropertyType
     {
         Hotel,
         Apartment,

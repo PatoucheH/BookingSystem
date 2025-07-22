@@ -7,12 +7,13 @@ namespace BookingSystem.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-        public virtual DbSet<Properties> Properties { get; set; }
+        public virtual DbSet<Property> Properties { get; set; }
+        public virtual DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Properties>(entity =>
+            modelBuilder.Entity<Property>(entity =>
             {
                 entity.HasKey(p => p.Id);
                 entity.Property(p => p.Town)
@@ -39,6 +40,12 @@ namespace BookingSystem.Data
                     .HasForeignKey(p => p .OwnerId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Property)
+                .WithMany() 
+                .HasForeignKey(b => b.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
         }

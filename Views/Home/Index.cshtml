@@ -1,4 +1,4 @@
-﻿@model BookingSystem.Models.ViewModels.PropertiesSearchViewModel
+﻿@model BookingSystem.Models.ViewModels.PropertySearchViewModel
 @using Microsoft.AspNetCore.Identity
 @using BookingSystem.Models
 @inject SignInManager<ApplicationUser> SignInManager
@@ -17,7 +17,7 @@
                         <input asp-for="Country" placeholder="Country" class="p-2 border-bottom rounded w-40" />
                         <input asp-for="GuestNbr" placeholder="Guest" class="p-2 border-bottom rounded w-32" />
                         <input asp-for="Price" placeholder="Price" class="p-2 border-bottom rounded w-32" />
-                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertiesType>()" placeholder="Type"
+                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertyType>()" placeholder="Type"
                             class="p-2 border rounded w-40">
                             <option value="">Type</option>
                         </select>
@@ -30,21 +30,21 @@
     @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
     {   <div class="ml-8 flex items-center">
             <a asp-controller="Form" asp-action="Index"
+
                class="bg-green-500 text-white font-bold py-4 px-8 rounded-full whitespace-nowrap hover:scale-105 transition duration-200"
                style="min-width: 100px;">
                 Add a property
             </a>
-    </div>
+        </div>
     }
     </div>
-
 
     @if(Model.Results.Any())
     {
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mx-8 mb-8">
             @foreach (var p in Model.Results)
             {
-                <a href="https://localhost:7120/@p.Title" class="block">
+                <a asp-controller="Property" asp-action="Details" asp-route-id="@p.Id" class="block">
                     <div class="container bg-green-400 rounded-[50px] flex flex-col items-center justify-start mt-8 overflow-hidden h-[500px]">
                         <div class="w-full h-[250px] bg-gray-600 rounded-t-[50px] flex items-center justify-center">
                             @if (!string.IsNullOrWhiteSpace(p.Photo))

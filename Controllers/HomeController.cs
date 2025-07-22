@@ -8,22 +8,20 @@ namespace BookingSystem.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
 
-        private readonly PropertiesService? _propertiesService;
-        public HomeController(ILogger<HomeController> logger, IPropertiesService propertiesService)
+        private readonly PropertyService? _propertyService;
+        public HomeController(IPropertyService propertyService)
         {
-            _logger = logger;
-            _propertiesService = (PropertiesService?)propertiesService;
+            _propertyService = (PropertyService?)propertyService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var properties = await _propertiesService.GetSearchProperties(null, null, null, null, null);
-            var viewModel = new PropertiesSearchViewModel
+            var properties = await _propertyService.GetSearchProperties(null, null, null, null, null);
+            var viewModel = new PropertySearchViewModel
             {
-                Results = (IEnumerable<Models.DTOs.PropertiesDTO>)properties
+                Results = (IEnumerable<Models.DTOs.PropertyDTO>)properties
             };
             return View(viewModel);
         }
@@ -34,18 +32,12 @@ namespace BookingSystem.Controllers
             return View();
         }
 
-        [HttpGet]
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
 
 
         [HttpPost]
-        public async Task<ActionResult> Index(PropertiesSearchViewModel model)
+        public async Task<ActionResult> Index(PropertySearchViewModel model)
         {
-            var results = await _propertiesService.GetSearchProperties
+            var results = await _propertyService.GetSearchProperties
             (
                 model.Country,
                 model.Town,

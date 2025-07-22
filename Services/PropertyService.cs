@@ -6,22 +6,23 @@ using Microsoft.EntityFrameworkCore;
 namespace BookingSystem.Services
 {
 
-    public interface IPropertiesService
+    public interface IPropertyService
     {
-        Task<IEnumerable<Properties>> GetAllProperties();
-        Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, double? price, PropertiesType? type);
+        Task<IEnumerable<Property>> GetAllProperties();
+        Task<IEnumerable<PropertyDTO>> GetSearchProperties(string country, string town, int? guestNbr, double? price, PropertyType? type);
 
-        Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO, string userId);
+        Task<PropertyDTO> CreateProperty(PropertyDTO propertyDTO, string userId);
+        Task<Property> GetPropertyById(int id);
     }
-    public class PropertiesService(ApplicationDbContext context) : IPropertiesService
-    { 
+    public class PropertyService(ApplicationDbContext context) : IPropertyService
+    {
         private readonly ApplicationDbContext _context = context;
-        public async Task<IEnumerable<Properties>> GetAllProperties() 
+        public async Task<IEnumerable<Property>> GetAllProperties()
         {
             return await _context.Properties.ToListAsync();
         }
 
-        public async Task<IEnumerable<PropertiesDTO>> GetSearchProperties(string country, string town, int? guestNbr, double? price, PropertiesType? type)
+        public async Task<IEnumerable<PropertyDTO>> GetSearchProperties(string country, string town, int? guestNbr, double? price, PropertyType? type)
         {
             var query = _context.Properties.AsQueryable();
             if (!string.IsNullOrWhiteSpace(country)) query = query.Where(p => p.Country == country);
@@ -31,8 +32,9 @@ namespace BookingSystem.Services
             if (type.HasValue) query = query.Where(p => p.Type == type.Value);
 
             var result = await query
-                .Select(p => new PropertiesDTO
+                .Select(p => new PropertyDTO
                 {
+                    Id = p.Id,
                     Price = p.Price,
                     Title = p.Title,
                     Country = p.Country,
@@ -46,25 +48,30 @@ namespace BookingSystem.Services
             return result;
         }
 
-        public async Task<PropertiesDTO> CreateProperties(PropertiesDTO propertiesDTO, string userId)
+        public async Task<PropertyDTO> CreateProperty(PropertyDTO propertyDTO, string userId)
         {
             if (string.IsNullOrEmpty(userId)) throw new UnauthorizedAccessException("User not connected !");
-            var properties = new Properties
+            var property = new Property
             {
-                Town = propertiesDTO.Town,
-                Country = propertiesDTO.Country,
-                GuestNbr = propertiesDTO.GuestNbr,
-                Type = propertiesDTO.Type,
-                Description = propertiesDTO.Description,
-                Title = propertiesDTO.Title,
-                Price = propertiesDTO.Price,
-                Photo = propertiesDTO.Photo,
+                Town = propertyDTO.Town,
+                Country = propertyDTO.Country,
+                GuestNbr = propertyDTO.GuestNbr,
+                Type = propertyDTO.Type,
+                Description = propertyDTO.Description,
+                Title = propertyDTO.Title,
+                Price = propertyDTO.Price,
+                Photo = propertyDTO.Photo,
                 OwnerId = userId
             };
 
-            _context.Properties.Add(properties);
+            _context.Properties.Add(property);
             await _context.SaveChangesAsync();
-            return propertiesDTO;
+            return propertyDTO;
+        }
+
+        public async Task<Property> GetPropertyById(int id)
+        {
+            return await _context.Properties.FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }
