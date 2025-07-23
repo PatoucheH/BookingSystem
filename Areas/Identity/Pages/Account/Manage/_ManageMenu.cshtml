@@ -1,4 +1,6 @@
-﻿@{
+﻿@inject SignInManager<ApplicationUser> SignInManager
+
+@{
 }
 
 <div class="w-3/4 mx-auto bg-green-400 rounded-full p-12 mb-8">
@@ -12,6 +14,19 @@
         <li class="px-4 py-2 hover:scale-105 transition duration-200">
             <a asp-page="./DeletePersonalData" class="px-4 py-2 inline-block">Delete the account</a>
         </li>
+        @if(SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+        {
+            <li class="px-4 py-2 hover:scale-105 transition duration-200">
+                <a asp-page="./MyProperties" class="px-4 py-2 inline-block">My properties list</a>
+            </li>
+        }
+        @if(SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+        {
+            <li class="px-4 py-2 hover:scale-105 transition duration-200">
+                <a asp-controller="User" asp-action="Index" class="px-4 py-2 inline-block">List of all the user</a>
+            </li>
+
+        }
         @* <li class="px-4 py-2 hover:scale-105 transition duration-200">
             <a asp-page="./TwoFactorAuthentication" class="px-4 py-2 inline-block">Two factors authentication</a>
         </li> *@

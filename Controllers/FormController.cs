@@ -32,6 +32,19 @@ namespace BookingSystem.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account");
 
+            if(property.PhotoFile is not null && property.PhotoFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                Directory.CreateDirectory(uploadsFolder);
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(property.PhotoFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using(var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await property.PhotoFile.CopyToAsync(stream);
+                }
+                property.Photo = "/uploads/" + uniqueFileName;
+            }
+
             await _propertyService.CreateProperty(property, userId);
             return RedirectToAction("Index", "Home");
         }

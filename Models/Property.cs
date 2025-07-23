@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BookingSystem.Models
 {
@@ -13,6 +14,8 @@ namespace BookingSystem.Models
         public string? Title { get; set; }
         public Double Price { get; set; }
         internal string? Photo { get; set; }
+        [NotMapped]
+        public IFormFile? PhotoFile { get; set; }
         internal string? OwnerId { get; set; }
         [JsonIgnore]
         internal virtual ApplicationUser? Owner { get; set; }

@@ -1,0 +1,36 @@
+﻿@page
+@model BookingSystem.Areas.Identity.Pages.Account.Manage.MyPropertiesModel
+
+@{
+    ViewData["Title"] = "Manage Properties";
+    Layout = "_ManageLayout";
+}
+
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-xl min-w-lg mx-auto">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">List of all my properties</h2>
+            <table class="table-auto border-collapse border border-gray-400 w-full">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-400 px-4 py-2">Title</th>
+                        <th class="border border-gray-400 px-4 py-2">Price</th>
+                        <th class="border border-gray-400 px-4 py-2">Location</th>
+                        <th class="border border-gray-400 px-4 py-2">Number of Guest</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var property in Model.Properties)
+                    {
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2">@property.Title</td>
+                            <td class="border border-gray-300 px-4 py-2">@property.Price</td>
+                            <td class="border border-gray-300 px-4 py-2">@property.Town, @property.Country</td>
+                            <td class="border border-gray-300 px-4 py-2">@property.GuestNbr</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

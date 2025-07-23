@@ -12,9 +12,17 @@
     <div class="bg-white rounded-3xl shadow-lg p-6 mb-6">
         <h1 class="text-4xl font-bold text-green-600 text-center">@Model.Property.Title</h1>
     </div>
-
     <div class="bg-white rounded-3xl shadow-lg overflow-hidden mb-6">
-        <img src="@Model.Property.Photo" alt="Property photo" class="w-full h-96 object-cover" />
+        @if (!string.IsNullOrWhiteSpace(Model.Property.Photo))
+        {
+            <img src="@Url.Content(Model.Property.Photo)" alt="Property photo" class="w-full h-96 object-cover" />
+        }
+        else
+        {
+            <div class="w-full h-96 bg-gray-200 flex items-center justify-center text-gray-600 font-semibold">
+                No Photo Available
+            </div>
+        }
     </div>
 
     <div class="bg-white rounded-3xl shadow-lg p-8 mb-6">

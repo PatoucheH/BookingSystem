@@ -49,7 +49,7 @@
                         <div class="w-full h-[250px] bg-gray-600 rounded-t-[50px] flex items-center justify-center">
                             @if (!string.IsNullOrWhiteSpace(p.Photo))
                             {
-                                <img src="@p.Photo" alt="No photo" class="w-full h-full object-cover" />
+                                <img src="@Url.Content(p.Photo)" alt="Property photo" class="w-full h-full object-cover" />
                             }
                             else
                             {

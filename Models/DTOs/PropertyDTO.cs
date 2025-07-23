@@ -11,5 +11,6 @@
         public string? Description { get; set; }
         public string? Title { get; set; }
         internal string? Photo { get; set; }
+        public IFormFile? PhotoFile { get; set; }
     }
 }
