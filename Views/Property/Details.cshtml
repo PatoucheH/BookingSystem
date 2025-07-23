@@ -1,4 +1,7 @@
-﻿@model BookingSystem.Models.ViewModels.PropertyDetailsViewModel
+﻿@using Microsoft.AspNetCore.Identity
+@model BookingSystem.Models.ViewModels.PropertyDetailsViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+
 @{
     ViewData["Title"] = "Property Details";
     var bookings = Model.Bookings
@@ -42,6 +45,16 @@
             <p class="text-gray-700 leading-relaxed text-lg">@Model.Property.Description</p>
         </div>
     </div>
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+    {
+        <div class="ml-8 flex items-center">
+            <a asp-controller="Form" asp-action="Index"
+               class="bg-green-500 text-white font-bold py-4 px-8 rounded-full whitespace-nowrap hover:scale-105 transition duration-200"
+               style="min-width: 100px;">
+                Edit the property
+            </a>
+        </div>
+    }
 
     <div class="bg-white rounded-3xl shadow-lg p-8" id="booking-section">
         <h2 class="text-3xl font-bold text-green-600 text-center mb-8">Book Your Stay</h2>

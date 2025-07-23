@@ -9,6 +9,7 @@ using System.Security.Claims;
 
 namespace BookingSystem.Controllers
 {
+    [Authorize(Roles = "Admin,Owner")]
     public class FormController : Controller
     {
         private readonly PropertyService? _propertyService;
@@ -18,14 +19,13 @@ namespace BookingSystem.Controllers
             _propertyService = (PropertyService?)propertyService;
         }
 
-        [Authorize(Roles = "Admin,Owner")]
+        
         [HttpGet]
         public IActionResult Index()
         {
             return View(new PropertyDTO());
         }
 
-        [Authorize(Roles = "Admin, Owner")]
         [HttpPost]
         public async Task<IActionResult> Index([FromForm] PropertyDTO property)
         {

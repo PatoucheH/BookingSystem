@@ -13,6 +13,7 @@ namespace BookingSystem.Services
 
         Task<PropertyDTO> CreateProperty(PropertyDTO propertyDTO, string userId);
         Task<Property> GetPropertyById(int id);
+        Task UpdateAsync(Property property);
     }
     public class PropertyService(ApplicationDbContext context) : IPropertyService
     {
@@ -90,6 +91,12 @@ namespace BookingSystem.Services
                     Type = p.Type
                 })
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateAsync(Property property)
+        {
+            _context.Properties.Update(property);
+            await _context.SaveChangesAsync();
         }
     }
 }

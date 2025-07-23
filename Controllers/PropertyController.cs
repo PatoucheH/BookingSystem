@@ -69,5 +69,42 @@ namespace BookingSystem.Controllers
             TempData["Success"] = "Booking confirmed";
             return RedirectToAction("Details", new { id = propertyId });
         }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var property = await _propertyService.GetPropertyById(id);
+            if (property == null) return NotFound();
+
+            Console.WriteLine($"Edit GET => Property ID: {property.Id}");
+
+            return View(property);
+        }
+
+        [Authorize(Roles = "Admin, Owner")]
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromForm] Property property)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(property);
+            }
+
+            var existingProperty = await _propertyService.GetPropertyById(property.Id);
+            if (existingProperty == null)
+            {
+                return NotFound();
+            }
+
+            existingProperty.Title = property.Title;
+            existingProperty.Description = property.Description;
+            existingProperty.Price = property.Price;
+            existingProperty.GuestNbr = property.GuestNbr;
+
+            await _propertyService.UpdateAsync(existingProperty);
+
+            return RedirectToAction("Details","Property", new { id = existingProperty.Id });
+        }
     }
 }
