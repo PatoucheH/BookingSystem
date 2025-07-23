@@ -16,6 +16,7 @@ namespace BookingSystem.Models
         internal string? OwnerId { get; set; }
         [JsonIgnore]
         internal virtual ApplicationUser? Owner { get; set; }
+        public List<Booking> Bookings { get; set; } = new();
 
     }
 }

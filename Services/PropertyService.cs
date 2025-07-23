@@ -98,5 +98,16 @@ namespace BookingSystem.Services
             _context.Properties.Update(property);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> DeleteProperty(int id)
+        {
+            var property = await _context.Properties.Include(p => p.Bookings).FirstOrDefaultAsync(p => p.Id == id);
+            if (property is null) return false;
+
+            _context.Bookings.RemoveRange(property.Bookings);
+            _context.Properties.Remove(property);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

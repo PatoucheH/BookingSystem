@@ -1,5 +1,6 @@
 ﻿using BookingSystem.Data;
 using BookingSystem.Models;
+using BookingSystem.Models.DTOs;
 using BookingSystem.Models.ViewModels;
 using BookingSystem.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -33,6 +34,7 @@ namespace BookingSystem.Controllers
                 .ToListAsync();
             var viewModel = new PropertyDetailsViewModel
             {
+                Id = id,
                 Property = property,
                 Bookings = bookings
             };
@@ -77,34 +79,41 @@ namespace BookingSystem.Controllers
             var property = await _propertyService.GetPropertyById(id);
             if (property == null) return NotFound();
 
-            Console.WriteLine($"Edit GET => Property ID: {property.Id}");
-
             return View(property);
         }
 
         [Authorize(Roles = "Admin, Owner")]
         [HttpPost]
-        public async Task<IActionResult> Edit([FromForm] Property property)
+        public async Task<IActionResult> Edit([FromForm] PropertyDTO propertyDTO)
         {
             if (!ModelState.IsValid)
             {
-                return View(property);
+                return View(propertyDTO);
             }
 
-            var existingProperty = await _propertyService.GetPropertyById(property.Id);
+            var existingProperty = await _propertyService.GetPropertyById(propertyDTO.Id);
             if (existingProperty == null)
             {
                 return NotFound();
+                Console.WriteLine("You failed asshole !!");
             }
 
-            existingProperty.Title = property.Title;
-            existingProperty.Description = property.Description;
-            existingProperty.Price = property.Price;
-            existingProperty.GuestNbr = property.GuestNbr;
+            existingProperty.Title = propertyDTO.Title;
+            existingProperty.Description = propertyDTO.Description;
+            existingProperty.Price = propertyDTO.Price;
+            existingProperty.GuestNbr = propertyDTO.GuestNbr;
 
             await _propertyService.UpdateAsync(existingProperty);
 
             return RedirectToAction("Details","Property", new { id = existingProperty.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var success = await _propertyService.DeleteProperty(id);
+            if (!success) return NotFound();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

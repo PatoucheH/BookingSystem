@@ -38,14 +38,14 @@ namespace BookingSystem.Data
                 entity.HasOne(p => p.Owner)
                     .WithMany(h => h.Properties)
                     .HasForeignKey(p => p .OwnerId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Property)
                 .WithMany() 
                 .HasForeignKey(b => b.PropertyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }

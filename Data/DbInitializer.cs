@@ -42,7 +42,7 @@ namespace BookingSystem.Data
                 {
                      new Property
                     {
-                        Town = "Bx",
+                        Town = "Bruxelles",
                         Country = "Belgium",
                         Type = PropertyType.Hotel,
                         Description = "blablabla",
@@ -54,12 +54,12 @@ namespace BookingSystem.Data
                     },
                     new Property
                     {
-                        Town = "Charlouz",
+                        Town = "Charleroi",
                         Country = "Belgium",
                         Type = PropertyType.Hotel,
                         Description = "lololol",
-                        Title = "Awful hotel",
-                        Price = 10,
+                        Title = "Big hotel",
+                        Price = 100,
                         GuestNbr = 4,
                         Photo = "/css/assets/Patou_logo.png",
                         OwnerId = user1.Id
