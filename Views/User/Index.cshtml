@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<BookingSystem.Models.DTOs.UserDTO>
 
-@functions {
+@{
+    ViewData["Title"] = "View User";
+    Layout = "_ManageLayout";
     string GetBadgeClass(string role)
     {
         return role switch

@@ -175,6 +175,38 @@ namespace BookingSystem.Data.Migrations
                     b.ToTable("Properties");
                 });
 
+            modelBuilder.Entity("BookingSystem.Models.Rating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PropertyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("Ratings");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -341,6 +373,17 @@ namespace BookingSystem.Data.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("BookingSystem.Models.Rating", b =>
+                {
+                    b.HasOne("BookingSystem.Models.Property", "Property")
+                        .WithMany("Ratings")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -400,6 +443,8 @@ namespace BookingSystem.Data.Migrations
             modelBuilder.Entity("BookingSystem.Models.Property", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Ratings");
                 });
 #pragma warning restore 612, 618
         }

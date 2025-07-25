@@ -7,7 +7,7 @@
 
 @{
     ViewData["Title"] = "Personal Data";
-    Layout = "_ManageLayout";
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
     var user = await UserManager.GetUserAsync(User);
     var roles = await UserManager.GetRolesAsync(user);
 }

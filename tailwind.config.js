@@ -3,6 +3,7 @@ module.exports = {
         "./Views/**/*.cshtml",
         "./wwwroot/js/**/*.js",
         "./Pages/**/*.cshtml",
+        './Areas/**/*.cshtml',
     ],
     theme: {
         extend: {},

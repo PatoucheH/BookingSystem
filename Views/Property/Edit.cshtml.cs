@@ -2,7 +2,6 @@ using BookingSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookingSystem.Models;
-using BookingSystem.Services; 
 
 namespace BookingSystem.Pages.Properties
 {

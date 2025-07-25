@@ -8,6 +8,19 @@
             .Select(b => new { start = b.StartDate.ToString("yyyy-MM-dd"), end = b.EndDate.ToString("yyyy-MM-dd") });
 }
 
+@if (TempData["Error"] != null)
+{
+    <div class="flash-message bg-red-500 text-white p-4 rounded my-2 shadow-md animate-bounce">
+        @TempData["Error"]
+    </div>      
+}               
+@if (TempData["Success"] != null)
+{               
+    <div class="flash-message bg-green-500 text-white p-4 rounded my-2 shadow-md">
+        @TempData["Success"]
+    </div>
+}
+
 <div class="max-w-4xl mx-auto p-8 mb-20">
     <div class="bg-white rounded-3xl shadow-lg p-6 mb-6">
         <h1 class="text-4xl font-bold text-green-600 text-center">@Model.Property.Title</h1>
@@ -24,6 +37,40 @@
             </div>
         }
     </div>
+    <div class="mb-2 flex flex-row items-center space-x-4 justify-evenly">
+        <p class="mb-0">Ratings : @Model.Property.AverageRating.ToString("0.0") / 5</p>
+
+        <form method="post" asp-action="Rate" class="flex flex-row items-center space-x-2">
+            <input type="hidden" name="propertyId" value="@Model.Property.Id" />
+            <input type="hidden" id="rating-value" name="value" value="0" />
+
+            <div class="flex flex-row space-x-1" id="star-rating">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-6 w-6 text-gray-300 hover:text-yellow-500 cursor-pointer star-icon transition-colors duration-200"
+                         fill="currentColor"
+                         viewBox="0 0 24 24"
+                         data-rating="@i"
+                         onclick="setRating(@i)">
+                        <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.782L19.336 24 12 20.013 4.664 24l1.402-9.007L.132 9.211l8.2-1.193z" />
+                    </svg>
+                }
+            </div>
+
+            <input type="text"
+                   id="rating-message"
+                   name="message"
+                   placeholder="Write your message for the owner"
+                   class="p-2 border rounded w-64" />
+
+            <button type="submit"
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                Rate my property
+            </button>
+        </form>
+    </div>
+
 
     <div class="bg-white rounded-3xl shadow-lg p-8 mb-6">
         <div class="grid md:grid-cols-1 gap-8">
@@ -139,105 +186,18 @@
     </div>
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
-<style>
-    .flatpickr-calendar {
-        border-radius: 1rem ;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) ;
-        border: 2px solid #bbf7d0 ;
-    }
 
-    .flatpickr-day.selected, .flatpickr-day.selected:hover {
-        background: #4ade80 ;
-        border-color: #4ade80 ;
-    }
 
-    .flatpickr-day.inRange {
-        background: #bbf7d0 ;
-        color: #065f46 ;
-    }
-
-    .flatpickr-day:hover {
-        background: #ecfdf5 ;
-        color: #065f46 ;
-    }
-
-    .flatpickr-months .flatpickr-month {
-        background: #4ade80 ;
-        color: black ;
-    }
-
-    .flatpickr-current-month .flatpickr-monthDropdown-months,
-    .flatpickr-current-month input.cur-year {
-        background: transparent ;
-        color: black ;
-    }
-
-    .flatpickr-weekday {
-        background: #f0fdf4 ;
-        color: #166534 ;
-        font-weight: bold ;
-    }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<script>
-    var unavailableRanges = @Html.Raw(Json.Serialize(bookings));
-    var pricePerNight = @Model.Property.Price;
-
-    function scrollToBooking() {
-        document.getElementById('booking-section').scrollIntoView({
-            behavior: 'smooth'
-        });
-    }
-
-    function updateBookingSummary(selectedDates) {
-        const summaryDiv = document.getElementById('booking-summary');
-        const submitBtn = document.getElementById('submit-booking');
-
-        if (selectedDates.length === 2) {
-            const startDate = selectedDates[0];
-            const endDate = selectedDates[1];
-            const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-            const totalPrice = nights * pricePerNight;
-
-            document.getElementById('checkin-date').textContent = startDate.toLocaleDateString();
-            document.getElementById('checkout-date').textContent = endDate.toLocaleDateString();
-            document.getElementById('total-nights').textContent = nights;
-            document.getElementById('total-price').textContent = totalPrice;
-
-            summaryDiv.classList.remove('hidden');
-            submitBtn.disabled = false;
-
-            summaryDiv.style.opacity = '0';
-            summaryDiv.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                summaryDiv.style.transition = 'all 0.3s ease';
-                summaryDiv.style.opacity = '1';
-                summaryDiv.style.transform = 'translateY(0)';
-            }, 10);
-        } else {
-            summaryDiv.classList.add('hidden');
-            submitBtn.disabled = true;
-        }
-    }
-
-    flatpickr("#date-range", {
-        mode: "range",
-        minDate: "today",
-        dateFormat: "Y-m-d",
-        disable: unavailableRanges.map(b => ({
-            from: b.start,
-            to: b.end
-        })),
-        onChange: function(selectedDates) {
-            if (selectedDates.length === 2) {
-                document.getElementById("StartDate").value = selectedDates[0].toISOString();
-                document.getElementById("EndDate").value = selectedDates[1].toISOString();
-            }
-            updateBookingSummary(selectedDates);
-        }
-    });
-</script>
+@section Styles {
+    <link href="~/css/Property_Details.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+}
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        window.unavailableRanges = @Html.Raw(Json.Serialize(bookings));
+        window.pricePerNight = @Model.Property.Price;
+    </script>
+    <script src="~/js/Property_Details.js"></script>
+}

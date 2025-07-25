@@ -8,29 +8,48 @@
 @{
     ViewData["Title"] = "Home";
 }
+@if (TempData["Error"] != null)
+{
+    <div class="flash-message bg-red-500 text-white p-4 rounded my-2 shadow-md animate-bounce">
+        @TempData["Error"]
+    </div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="flash-message bg-green-500 text-white p-4 rounded my-2 shadow-md">
+        @TempData["Success"]
+    </div>
+}
 <div class="mx-8 mb-8 px-8 pb-8">
-    <div class="flex justify-center m-8">
-        <div class="bg-green-400 rounded-full px-8 flex items-center justify-center ">
-            <form asp-action="Index" method="post" class="m-8">
-                <div class="flex flex-wrap gap-6 itesm-center">
-                        <input asp-for="Town" placeholder="City" class="p-2 border-bottom rounded w-40"/>
-                        <input asp-for="Country" placeholder="Country" class="p-2 border-bottom rounded w-40" />
-                        <input asp-for="GuestNbr" placeholder="Guest" class="p-2 border-bottom rounded w-32" />
-                        <input asp-for="Price" placeholder="Price" class="p-2 border-bottom rounded w-32" />
-                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertyType>()" placeholder="Type"
+    <div class="flex justify-center mx-4 mt-8">
+        <div class="w-3/4 bg-green-400 rounded-full px-8 py-6 flex items-center justify-center">
+            <form asp-action="Index" method="post" class="space-y-4 w-full max-w-5xl">
+                <div class="flex flex-wrap gap-6 justify-center items-center">
+                    <input asp-for="Town" placeholder="City" class="p-2 border-b border-gray-300 rounded w-40" />
+                    <input asp-for="Country" placeholder="Country" class="p-2 border-b border-gray-300 rounded w-40" />
+                    <input asp-for="GuestNbr" placeholder="Guest" class="p-2 border-b border-gray-300 rounded w-32" />
+                    <input asp-for="Price" placeholder="Price" class="p-2 border-b border-gray-300 rounded w-32" />
+                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<BookingSystem.Models.PropertyType>()"
                             class="p-2 border rounded w-40">
-                            <option value="">Type</option>
-                        </select>
-                    <button type="submit" class="bg-white text-green-600 font-bold py-0 px-4 rounded transition duration-200 hover:scale-120">
-                            Search
-                        </button> 
+                        <option value="">Type</option>
+                    </select>
                 </div>
+                <div class="flex gap-6 justify-center items-center">
+                    <input asp-for="StartDate" type="date" class="p-2 border rounded w-44" />
+                    <input asp-for="EndDate" type="date" class="p-2 border rounded w-44" />
+                </div>
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-white text-green-600 font-bold py-1 px-6 rounded transition duration-200 hover:scale-110">
+                        Search
+                    </button>
+                </div>
+
             </form>
         </div>
+
     @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
     {   <div class="ml-8 flex items-center">
             <a asp-controller="Form" asp-action="Index"
-
                class="bg-green-500 text-white font-bold py-4 px-8 rounded-full whitespace-nowrap hover:scale-105 transition duration-200"
                style="min-width: 100px;">
                 Add a property
@@ -46,10 +65,10 @@
             {
                 <a asp-controller="Property" asp-action="Details" asp-route-id="@p.Id" class="block">
                     <div class="container bg-green-400 rounded-[50px] flex flex-col items-center justify-start mt-8 overflow-hidden h-[500px]">
-                        <div class="w-full h-[250px] bg-gray-600 rounded-t-[50px] flex items-center justify-center">
+                        <div class="w-full h-[250px] bg-gray-600 rounded-[50px] flex items-center justify-center">
                             @if (!string.IsNullOrWhiteSpace(p.Photo))
                             {
-                                <img src="@Url.Content(p.Photo)" alt="Property photo" class="w-full h-full object-cover" />
+                                <img src="@Url.Content(p.Photo)" alt="Property photo" class="w-full h-full object-cover rounded-[50px]" />
                             }
                             else
                             {
@@ -60,10 +79,10 @@
                         </div>
                         <div class="m-2 text-center font-bold text-xl">@p.Title</div>
                         <div class="m-2 text-center">@p.Town, @p.Country</div>
-                        <div class="m-2 text-center">@p.Description</div>
+                        <div class="m-2 px-3 text-center max-w-full overflow-hidden break-all line-clamp-2">@p.Description</div>
                         <div class="m-2 text-center">
                             <span>@p.Price € / Night</span><br />
-                            <span>Max guests: @p.GuestNbr</span>
+                            <span>Max guests : @p.GuestNbr</span>
                         </div>
                     </div>
                 </a>
@@ -72,6 +91,8 @@
     }
     else
     {
-        <p>No propriety match !</p>
+        <div class="w-full mt-12 text-center text-3xl font-bold">
+            <p class="text-red-600">No propriety match !</p>
+        </div>
     }
 </div>

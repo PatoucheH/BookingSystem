@@ -13,13 +13,13 @@ namespace BookingSystem.Models
         public string? Description { get; set; }
         public string? Title { get; set; }
         public Double Price { get; set; }
-        internal string? Photo { get; set; }
+        public string? Photo { get; set; }
         [NotMapped]
         public IFormFile? PhotoFile { get; set; }
         internal string? OwnerId { get; set; }
         [JsonIgnore]
-        internal virtual ApplicationUser? Owner { get; set; }
+        public virtual ApplicationUser? Owner { get; set; }
+        public List<Rating> Ratings { get; set; } = new();
         public List<Booking> Bookings { get; set; } = new();
-
     }
 }

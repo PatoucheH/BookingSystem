@@ -28,7 +28,7 @@ namespace BookingSystem
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
+            builder.Services.AddHttpContextAccessor();
             //  Enregistrement des services personnalisés
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPropertyService, PropertyService>();
@@ -45,7 +45,7 @@ namespace BookingSystem
             //MVC & Razor Pages
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
-
+            
             var app = builder.Build();
 
             //  Middleware

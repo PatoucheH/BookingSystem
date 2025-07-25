@@ -18,21 +18,13 @@ namespace BookingSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var properties = await _propertyService.GetSearchProperties(null, null, null, null, null);
+            var properties = await _propertyService.GetSearchProperties(null, null, null, null, null, null, null);
             var viewModel = new PropertySearchViewModel
             {
                 Results = (IEnumerable<Models.DTOs.PropertyDTO>)properties
             };
             return View(viewModel);
         }
-
-        [HttpGet]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-
 
         [HttpPost]
         public async Task<ActionResult> Index(PropertySearchViewModel model)
@@ -43,7 +35,9 @@ namespace BookingSystem.Controllers
                 model.Town,
                 model.GuestNbr,
                 model.Price,
-                model.Type
+                model.Type,
+                model.StartDate,
+                model.EndDate
             );
 
             model.Results = results;

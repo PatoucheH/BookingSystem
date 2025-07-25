@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
-using SQLitePCL;
+using System.Security.Claims;
 
 namespace BookingSystem.Controllers
 {
@@ -24,7 +23,7 @@ namespace BookingSystem.Controllers
             _userManager = userManager;
             _context = context;
         }
-
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var property = await _propertyService.GetPropertyDTOById(id);
@@ -32,6 +31,12 @@ namespace BookingSystem.Controllers
             var bookings = await _context.Bookings
                 .Where(b => b.PropertyId == id)
                 .ToListAsync();
+            var ratings = await _context.Ratings
+                .Where(r => r.PropertyId == id)
+                .Select(r => r.Value)
+                .ToListAsync();
+
+            property.AverageRating = ratings.Any() ? ratings.Average() : 0;
             var viewModel = new PropertyDetailsViewModel
             {
                 Id = id,
@@ -41,14 +46,15 @@ namespace BookingSystem.Controllers
             return View(viewModel);
         }
 
-        [Authorize(Roles ="Admin,Owner")]
         [HttpPost]
         public async Task<IActionResult> Book(int propertyId, DateTime startDate, DateTime endDate)
         {
+            var StartDateWithHours = startDate.Date.AddHours(16);
+            var EndDateWithHours = endDate.Date.AddHours(11);
             var overlaping = await _context.Bookings
                 .Where(b => b.PropertyId == propertyId &&
-                        ((startDate >= b.StartDate && startDate < b.EndDate) ||
-                        (endDate > b.StartDate && endDate <= b.EndDate)))
+                        ((StartDateWithHours >= b.StartDate && StartDateWithHours < b.EndDate) ||
+                        (EndDateWithHours > b.StartDate && EndDateWithHours <= b.EndDate)))
                 .AnyAsync();
 
             if(overlaping)
@@ -60,8 +66,8 @@ namespace BookingSystem.Controllers
             var booking = new Booking
             {
                 PropertyId = propertyId,
-                StartDate = startDate,
-                EndDate = endDate,
+                StartDate = StartDateWithHours,
+                EndDate = EndDateWithHours,
                 UserId = _userManager.GetUserId(User)
             };
 
@@ -76,8 +82,13 @@ namespace BookingSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var property = await _propertyService.GetPropertyById(id);
+            var property = await _propertyService.GetPropertyDTOById(id);
             if (property == null) return NotFound();
+            if (!User.IsInRole("Admin") && property.OwnerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                TempData["Error"] = "You are not authorized to edit this property.";
+                return RedirectToAction("Details", "Property", new {id}); 
+            }
 
             return View(property);
         }
@@ -95,7 +106,6 @@ namespace BookingSystem.Controllers
             if (existingProperty == null)
             {
                 return NotFound();
-                Console.WriteLine("You failed asshole !!");
             }
 
             existingProperty.Title = propertyDTO.Title;
@@ -108,12 +118,44 @@ namespace BookingSystem.Controllers
             return RedirectToAction("Details","Property", new { id = existingProperty.Id });
         }
 
+        [Authorize(Roles = "Admin, Owner")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _propertyService.DeleteProperty(id);
-            if (!success) return NotFound();
-            return RedirectToAction("Index", "Home");
+            if (!success)
+            {
+                TempData["Error"] = "Impossible to delete the property (maybe it's not yours)";
+                return RedirectToAction("Details", "Property", new { id });
+            }
+            else
+            {
+                TempData["Success"] = "Property succesfully deleted !!";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Rate(int propertyId, int value, string message)
+        {
+            var rating = new Rating
+            {
+                Value = value,
+                Message = message,
+                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            };
+
+            var success = await _propertyService.RatingProperty(propertyId, rating);
+            if (!success)
+            {
+                TempData["Error"] = "Impossible to add a rating ! (You maybe already add one or just never Book this property)";
+            }
+            else
+            {
+                TempData["Success"] = "Thanks for your rate !!";
+            }
+
+                return RedirectToAction("Details", new { id = propertyId });
         }
     }
 }

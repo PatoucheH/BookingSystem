@@ -4,15 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BookingSystem</title>
-    <script type="importmap"></script>
     <link href="~/lib/tailwind.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+
 </head>
 <body class="bg-emerald-50">
     <header class="bg-green-400 rounded-b-[75px] max-h-[250px] min-h-[150px] px-4 py-2 flex items-center justify-between">
-        <div class="ml-[50px]">
-            <img src="~/css/assets/patou_name_logo.png" alt="logo" class="h-[120px] object-contain" />
-        </div>
-        <a asp-area="" asp-controller="Home" asp-action="Index"
+        <a asp-controller="Home" asp-action="index">
+            <div class="ml-[50px] transition duration-200 hover:scale-110">
+                <img src="~/css/assets/patou_name_logo.png" alt="logo" class="h-[120px] object-contain" />
+            </div>
+        </a>
+        <a asp-controller="Home" asp-action="Index"
            class="text-5xl font-bold tracking-wider items-center cursor-pointer transition duration-200 hover:scale-110">
             BOOK YOUR DREAM
         </a>
@@ -26,7 +29,7 @@
     </div>
 
     <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-green-400 p-5 font-bold w-5/6 rounded-t-[50px] text-center shadow-lg max-h-[50px]">
-        &copy; 2025 - Booking System - By Martin Matin & Hugo l'escargot
+        &copy; @DateTime.Now.Year - Booking System - By Martin Matin & Hugo l'escargot
     </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

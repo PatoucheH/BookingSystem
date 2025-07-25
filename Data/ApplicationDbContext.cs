@@ -9,7 +9,7 @@ namespace BookingSystem.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public virtual DbSet<Property> Properties { get; set; }
         public virtual DbSet<Booking> Bookings { get; set; }
-
+        public virtual DbSet<Rating> Ratings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -47,7 +47,11 @@ namespace BookingSystem.Data
                 .HasForeignKey(b => b.PropertyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
+            modelBuilder.Entity<Rating>()
+                .HasOne(r => r.Property)
+                .WithMany(p => p.Ratings)
+                .HasForeignKey(r => r.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }
