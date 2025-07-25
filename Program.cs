@@ -45,7 +45,7 @@ namespace BookingSystem
             //MVC & Razor Pages
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
-            
+
             var app = builder.Build();
 
             //  Middleware
