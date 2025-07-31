@@ -19,7 +19,7 @@ namespace BookingSystem.Data
         /// <summary>
         /// Configure all services for the application
         /// </summary>
-        public static async Task ConfigureServices(WebApplicationBuilder builder)
+        public static Task ConfigureServices(WebApplicationBuilder builder)
         {
             // Configuration de la base de données
             var connectionString = GetConnectionString(builder);
@@ -58,6 +58,8 @@ namespace BookingSystem.Data
 
             // Configuration Stripe
             ConfigureStripe(builder);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -327,17 +329,46 @@ namespace BookingSystem.Data
         {
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
                          ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
+            if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
+            {
+                var railwayDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL")
+                    ?? throw new Exception("the env variable DATABASE_URL is unavailable on railway ");
 
-            if (app.Environment.EnvironmentName == "Docker")
+                var railwayConnectionString = ConvertRailwayUrlToConnectionString(railwayDbUrl, dbPassword);
+                return railwayConnectionString;
+            }
+            else if (app.Environment.EnvironmentName == "Docker")
             {
                 return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
             }
+            else
+            {
+                var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new Exception("DefaultConnection string is missing.");
 
-            var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new Exception("DefaultConnection string is missing.");
+                return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
+            }
 
-            return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
         }
+
+        private static string ConvertRailwayUrlToConnectionString(string railwayDbUrl, string dbPassword)
+        {
+            // Exemple d'URL Railway : postgresql://postgres:password@host:port/database
+            // Pour SQL Server, l'URL pourrait être : sqlserver://username:password@host:port;database=databaseName
+
+            // Analyser l'URL Railway
+            var uri = new Uri(railwayDbUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            var user = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : dbPassword; // Utiliser le mot de passe de l'URL ou celui fourni
+            var host = uri.Host;
+            var port = uri.Port;
+            var database = uri.LocalPath.TrimStart('/');
+
+            // Construire la chaîne de connexion SQL Server
+            return $"Server={host},{port};Database={database};User Id={user};Password={password};TrustServerCertificate=True;Encrypt=True;";
+        }
+
 
         /// <summary>
         /// Configure Stripe settings
