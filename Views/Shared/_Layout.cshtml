@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BookingSystem</title>
+    <link href="~/lib/tailwind.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+
+</head>
+<body class="bg-emerald-50">
+    <header class="bg-green-400 rounded-b-[75px] max-h-[250px] min-h-[150px] px-4 py-2 flex items-center justify-between">
+        <a asp-controller="Home" asp-action="index">
+            <div class="ml-[50px] transition duration-200 hover:scale-110">
+                <img src="~/css/assets/patou_name_logo.png" alt="logo" class="h-[120px] object-contain" />
+            </div>
+        </a>
+        <a asp-controller="Home" asp-action="Index"
+           class="text-5xl font-bold tracking-wider items-center cursor-pointer transition duration-200 hover:scale-110">
+            BOOK YOUR DREAM
+        </a>
+            <partial name="_LoginPartial" />
+    </header>
+
+    <div class="mx-auto" >
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-green-400 p-5 font-bold w-5/6 rounded-t-[50px] text-center shadow-lg max-h-[50px]">
+        &copy; @DateTime.Now.Year - Booking System - By Martin Matin & Hugo l'escargot
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

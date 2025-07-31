@@ -1,0 +1,13 @@
+﻿[*.cs]
+
+# CS8604: Existence possible d'un argument de référence null.
+dotnet_diagnostic.CS8604.severity = silent
+
+# CS8601: Existence possible d'une assignation de référence null.
+dotnet_diagnostic.CS8601.severity = silent
+
+# CS8602: Déréférencement d'une éventuelle référence null.
+dotnet_diagnostic.CS8602.severity = silent
+
+# CS8605: Conversion unboxing d'une valeur peut-être null.
+dotnet_diagnostic.CS8605.severity = silent

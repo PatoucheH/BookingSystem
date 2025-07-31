@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest   
+    container_name: bookingsqlserver
+    environment:
+      SA_PASSWORD: "${DB_PASSWORD}"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_AUTHENTICATION_MODE: "Mixed"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlvolume:/var/opt/mssql
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${DB_PASSWORD}", "-C", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    
+  web:
+    build: .
+    container_name: aspnetapp
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - DB_PASSWORD=${DB_PASSWORD}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+    networks:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  sqlvolume:
+
+networks:
+  backend:

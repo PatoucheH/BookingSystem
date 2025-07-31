@@ -1,0 +1,214 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model BookingSystem.Models.ViewModels.PropertyDetailsViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Property Details";
+    var bookings = Model.Bookings
+            .Select(b => new { start = b.StartDate.ToString("yyyy-MM-dd"), end = b.EndDate.ToString("yyyy-MM-dd") });
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="flash-message bg-red-500 text-white p-4 rounded my-2 shadow-md animate-bounce">
+        @TempData["Error"]
+    </div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="flash-message bg-green-500 text-white p-4 rounded my-2 shadow-md">
+        @TempData["Success"]
+    </div>
+}
+
+<div class="max-w-4xl mx-auto p-8 mb-20">
+    <div class="bg-white rounded-3xl shadow-lg p-6 mb-6">
+        <h1 class="text-4xl font-bold text-green-600 text-center">@Model.Property.Title</h1>
+    </div>
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden mb-6">
+        @if (!string.IsNullOrWhiteSpace(Model.Property.Photo))
+        {
+            <img src="@Url.Content(Model.Property.Photo)" alt="Property photo" class="w-full h-96 object-cover" />
+        }
+        else
+        {
+            <div class="w-full h-96 bg-gray-200 flex items-center justify-center text-gray-600 font-semibold">
+                No Photo Available
+            </div>
+        }
+    </div>
+    <div class="mb-2 flex flex-row items-center space-x-4 justify-evenly">
+        <p class="mb-0">Ratings : @Model.Property.AverageRating.ToString("0.0") / 5</p>
+
+        <form method="post" asp-action="Rate" class="flex flex-row items-center space-x-2">
+            <input type="hidden" name="propertyId" value="@Model.Property.Id" />
+            <input type="hidden" id="rating-value" name="value" value="0" />
+
+            <div class="flex flex-row space-x-1" id="star-rating">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-6 w-6 text-gray-300 hover:text-yellow-500 cursor-pointer star-icon transition-colors duration-200"
+                         fill="currentColor"
+                         viewBox="0 0 24 24"
+                         data-rating="@i"
+                         onclick="setRating(@i)">
+                        <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.782L19.336 24 12 20.013 4.664 24l1.402-9.007L.132 9.211l8.2-1.193z" />
+                    </svg>
+                }
+            </div>
+
+            <input type="text"
+                   id="rating-message"
+                   name="message"
+                   placeholder="Write your message for the owner"
+                   class="p-2 border rounded w-64" />
+
+            <button type="submit"
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                Rate my property
+            </button>
+        </form>
+    </div>
+
+
+    <div class="bg-white rounded-3xl shadow-lg p-8 mb-6">
+        <div class="grid md:grid-cols-1 gap-8">
+            <div class="space-y-4 mx-auto max-w-lg">
+                <div class="flex items-center p-4 bg-emerald-50 rounded-2xl">
+                    <div>
+                        <span class="font-bold text-gray-700">Location:</span>
+                        <span class="ml-2 text-gray-600">@Model.Property.Town, @Model.Property.Country</span>
+                    </div>
+                </div>
+                <div class="flex items-center p-4 bg-emerald-50 rounded-2xl">
+                    <div>
+                        <span class="font-bold text-gray-700">Price per night:</span>
+                        <span class="ml-2 text-green-600 font-bold text-xl">@Model.Property.Price €</span>
+                    </div>
+                </div>
+                <div class="flex items-center p-4 bg-emerald-50 rounded-2xl">
+                    <div>
+                        <span class="font-bold text-gray-700">Max Guests:</span>
+                        <span class="ml-2 text-gray-600">@Model.Property.GuestNbr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <h2 class="text-2xl font-bold text-green-600 mb-4">Description</h2>
+            <p class="text-gray-700 leading-relaxed text-lg">@Model.Property.Description</p>
+        </div>
+    </div>
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+    {
+        <div class="flex justify-center items-center my-6">
+            <a asp-controller="Property" asp-action="Edit" asp-route-id="@Model.Id"
+               class="bg-green-500 text-white font-bold py-4 px-8 rounded-full whitespace-nowrap hover:scale-105 transition duration-200"
+               style="min-width: 100px;">
+                Edit the property
+            </a>
+        </div>
+
+    }
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+    {
+        <div class="flex justify-center items-center my-6">
+            <form asp-action="Delete" asp-controller="Property" method="post" onsubmit="return confirm('Are you sure you want to delete this property?');">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="bg-red-500 text-white font-bold py-4 px-8 rounded-full whitespace-nowrap hover:scale-105 transition duration-200">
+                    Delete Property
+                </button>
+            </form>
+        </div>
+    }
+
+    <div class="bg-white rounded-3xl shadow-lg p-8" id="booking-section">
+        <h2 class="text-3xl font-bold text-green-600 text-center mb-8">Book Your Stay</h2>
+
+        <form asp-controller="Payment" asp-action="CreateCheckoutSession" method="post" class="space-y-6">
+            <input type="hidden" name="PropertyId" value="@Model.Property.Id" />
+            <input type="hidden" id="StartDate" name="StartDate" />
+            <input type="hidden" id="EndDate" name="EndDate" />
+            <input type="hidden" name="ProductName" value="@Model.Property.Title" />
+            <input type="hidden" id="amount" name="amount" value="" />
+
+            <div class="bg-emerald-50 rounded-2xl p-6">
+                <div class="flex items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-700">Select Your Dates</h3>
+                </div>
+
+                <div class="relative">
+                    <input type="text"
+                           id="date-range"
+                           placeholder="Choose your check-in and check-out dates"
+                           class="w-full p-4 border-2 border-green-200 rounded-2xl text-lg focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-200 transition duration-200 cursor-pointer bg-white"
+                           readonly />
+                </div>
+
+                <p class="text-sm text-gray-500 mt-2">Unavailable dates are automatically disabled</p>
+            </div>
+
+            <div id="booking-summary" class="hidden bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
+                <div class="flex items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-700">Booking Summary</h3>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div class="text-center">
+                        <div class="text-sm text-gray-500">Check-in</div>
+                        <div id="checkin-date" class="font-bold text-gray-700"></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-500">Check-out</div>
+                        <div id="checkout-date" class="font-bold text-gray-700"></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-500">Total nights</div>
+                        <div id="total-nights" class="font-bold text-gray-700"></div>
+                    </div>
+                </div>
+
+                <div class="text-center p-4 bg-white rounded-xl">
+                    <div class="text-lg font-bold text-green-600">
+                        Total: <span id="total-price">0</span> €
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit"
+                        id="stripe-booking"
+                        class="bg-green-400 hover:bg-green-500 text-white font-bold py-4 px-12 rounded-3xl shadow-lg transition duration-200 hover:scale-105 text-xl disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        disabled>
+                    Complete Booking
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+@section Styles {
+    <link href="~/css/Property_Details.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <script>
+        window.unavailableRanges = @Html.Raw(Json.Serialize(bookings));
+        window.pricePerNight = @Model.Property.Price;
+        window.propertyTitle = @Html.Raw(Json.Serialize(Model.Property.Title));
+        window.propertyId = @Model.Property.Id;
+        window.stripePublishableKey = @Html.Raw(Json.Serialize(Environment.GetEnvironmentVariable("STRIPE_PUBLISHABLE_KEY")));
+
+    </script>
+
+    <script src="/js/Property_Details.js"></script>
+}

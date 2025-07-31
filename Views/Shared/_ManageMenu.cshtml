@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+<div class="w-5/6 mx-auto bg-green-400 rounded-full mb-8">
+    <ul class="flex justify-center text-lg space-x-8">
+        <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
+            <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="inline-block font-semibold">Change the password</a>
+        </li>
+        <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
+            <a asp-area="Identity" asp-page="/Account/Manage/Email" class="inline-block font-semibold">Modify your email</a>
+        </li>
+        <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
+            <a asp-area="Identity" asp-page="/Account/Manage/DeletePersonalData" class="inline-block font-semibold">Delete the account</a>
+        </li>
+        @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+        {
+            <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
+                <a asp-area="Identity" asp-page="/Account/Manage/MyProperties" class="inline-block font-semibold">My Properties list</a>
+            </li>
+        }
+        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+        {
+            <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
+                <a asp-controller="User" asp-action="Index" class="inline-block font-semibold">List of all the users</a>
+            </li>
+        }
+        <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
+            <a asp-area="Identity" asp-page="/Account/Manage/MyBookings" class="inline-block font-semibold">My Booking list</a>
+        </li>
+        @* <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
+            <a asp-page="./TwoFactorAuthentication" class="inline-block font-semibold">Two factors authentication</a>
+        </li> *@
+    </ul>
+</div>
+
+

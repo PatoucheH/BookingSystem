@@ -1,0 +1,87 @@
+# =========================
+# ASP.NET Core + Tailwind
+# =========================
+
+# Build output
+bin/
+obj/
+out/
+Debug/
+Release/
+
+# wwwroot (si fichiers générés automatiquement)
+wwwroot/css/
+wwwroot/dist/
+wwwroot/build/
+wwwroot/node_modules/
+wwwroot/lib/
+
+# Tailwind/PostCSS
+tailwind.config.js
+tailwind.config.ts
+postcss.config.js
+postcss.config.ts
+*.tmp
+*.temp
+.cache/
+
+# Node.js / npm / Yarn
+node_modules/
+package-lock.json
+yarn.lock
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# Logs & coverage
+*.log
+TestResults/
+coverage/
+coverage*.json
+lcov.info
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.test
+
+# User-specific files
+*.rsuser
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# EF Core Migrations (générés automatiquement)
+Migrations/*.Designer.cs
+Migrations/*ModelSnapshot.cs
+
+# Secrets
+**/secrets.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+
+appsettings.*.json
+appsettings.json
