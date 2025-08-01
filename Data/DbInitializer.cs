@@ -100,8 +100,16 @@ namespace BookingSystem.Data
         {
             var connectionString = GetConnectionString(app);
 
-            // Créer la base de données si elle n'existe pas
-            await CreateDatabaseIfNotExists(connectionString);
+            // Sur Railway, Entity Framework gère automatiquement la création de base de données
+            // Pour local et Docker, créer la base si nécessaire
+            if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") == null)
+            {
+                await CreateDatabaseIfNotExists(connectionString);
+            }
+            else
+            {
+                Console.WriteLine("Railway environment detected - using Entity Framework migrations for database management");
+            }
 
             using var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
@@ -236,9 +244,9 @@ namespace BookingSystem.Data
         }
 
         /// <summary>
-        /// Create database if it doesn't exist
+        /// Create database if it doesn't exist (pour local et Docker uniquement)
         /// </summary>
-        public static async Task CreateDatabaseIfNotExists(string connectionString)
+        private static async Task CreateDatabaseIfNotExists(string connectionString)
         {
             try
             {
@@ -304,61 +312,6 @@ namespace BookingSystem.Data
         }
 
         /// <summary>
-        /// Get connection string from built application
-        /// </summary>
-        private static string GetConnectionString(WebApplication app)
-        {
-            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                         ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
-
-            Console.WriteLine($"DB_PASSWORD trouvé: {!string.IsNullOrEmpty(dbPassword)}");
-            Console.WriteLine($"RAILWAY_ENVIRONMENT: {Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT")}");
-
-            // Vérifier si on est sur Railway
-            if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
-            {
-                Console.WriteLine("Configuration Railway détectée (WebApplication)");
-
-                // Utiliser les variables d'environnement de Railway pour SQL Server
-                var server = Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")
-                            ?? Environment.GetEnvironmentVariable("MSSQL_SERVER");
-                var port = Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")
-                          ?? Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")
-                          ?? "1433";
-                var username = Environment.GetEnvironmentVariable("MSSQL_USERNAME") ?? "sa";
-                var database = Environment.GetEnvironmentVariable("MSSQL_DATABASE") ?? "BookingDB";
-
-                Console.WriteLine($"MSSQL_SERVER: {Environment.GetEnvironmentVariable("MSSQL_SERVER")}");
-                Console.WriteLine($"MSSQL_SERVER_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")}");
-                Console.WriteLine($"MSSQL_TCP_PORT: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")}");
-                Console.WriteLine($"MSSQL_USERNAME: {Environment.GetEnvironmentVariable("MSSQL_USERNAME")}");
-
-                if (string.IsNullOrEmpty(server))
-                {
-                    throw new Exception("Les variables d'environnement SQL Server de Railway sont manquantes. Server est vide.");
-                }
-
-                var connectionString = $"Server={server},{port};Database={database};User Id={username};Password={dbPassword};TrustServerCertificate=True;Encrypt=True;Connection Timeout=30;";
-                Console.WriteLine($"Connection String généré: Server={server},{port};Database={database};User Id={username};Password=***;...");
-
-                return connectionString;
-            }
-            else if (app.Environment.EnvironmentName == "Docker")
-            {
-                Console.WriteLine("Configuration Docker détectée (WebApplication)");
-                return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
-            }
-            else
-            {
-                Console.WriteLine("Configuration locale détectée (WebApplication)");
-                var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
-                    ?? throw new Exception("DefaultConnection string is missing.");
-
-                return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
-            }
-        }
-
-        /// <summary>
         /// Get the appropriate connection string based on environment
         /// </summary>
         private static string GetConnectionString(WebApplicationBuilder builder)
@@ -373,18 +326,21 @@ namespace BookingSystem.Data
             {
                 Console.WriteLine("Configuration Railway détectée");
 
+                // Utiliser PRIORITAIREMENT les variables publiques pour Railway
                 var server = Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")
                             ?? Environment.GetEnvironmentVariable("MSSQL_SERVER");
                 var port = Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")
                           ?? Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")
                           ?? "1433";
                 var username = Environment.GetEnvironmentVariable("MSSQL_USERNAME") ?? "sa";
-                var database = Environment.GetEnvironmentVariable("MSSQL_DATABASE") ?? "BookingDB";
+                var database = Environment.GetEnvironmentVariable("MSSQL_DATABASE") ?? "master";
 
                 Console.WriteLine($"MSSQL_SERVER: {Environment.GetEnvironmentVariable("MSSQL_SERVER")}");
                 Console.WriteLine($"MSSQL_SERVER_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")}");
                 Console.WriteLine($"MSSQL_TCP_PORT: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")}");
+                Console.WriteLine($"MSSQL_TCP_PORT_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")}");
                 Console.WriteLine($"MSSQL_USERNAME: {Environment.GetEnvironmentVariable("MSSQL_USERNAME")}");
+                Console.WriteLine($"MSSQL_DATABASE: {Environment.GetEnvironmentVariable("MSSQL_DATABASE")}");
 
                 if (string.IsNullOrEmpty(server))
                 {
@@ -405,6 +361,63 @@ namespace BookingSystem.Data
             {
                 Console.WriteLine("Configuration locale détectée");
                 var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new Exception("DefaultConnection string is missing.");
+
+                return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
+            }
+        }
+
+        /// <summary>
+        /// Get connection string from built application
+        /// </summary>
+        private static string GetConnectionString(WebApplication app)
+        {
+            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
+                         ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
+
+            Console.WriteLine($"DB_PASSWORD trouvé: {!string.IsNullOrEmpty(dbPassword)}");
+            Console.WriteLine($"RAILWAY_ENVIRONMENT: {Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT")}");
+
+            // Vérifier si on est sur Railway
+            if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
+            {
+                Console.WriteLine("Configuration Railway détectée (WebApplication)");
+
+                // Utiliser PRIORITAIREMENT les variables publiques pour Railway
+                var server = Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")
+                            ?? Environment.GetEnvironmentVariable("MSSQL_SERVER");
+                var port = Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")
+                          ?? Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")
+                          ?? "1433";
+                var username = Environment.GetEnvironmentVariable("MSSQL_USERNAME") ?? "sa";
+                var database = Environment.GetEnvironmentVariable("MSSQL_DATABASE") ?? "master";
+
+                Console.WriteLine($"MSSQL_SERVER: {Environment.GetEnvironmentVariable("MSSQL_SERVER")}");
+                Console.WriteLine($"MSSQL_SERVER_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")}");
+                Console.WriteLine($"MSSQL_TCP_PORT: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")}");
+                Console.WriteLine($"MSSQL_TCP_PORT_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")}");
+                Console.WriteLine($"MSSQL_USERNAME: {Environment.GetEnvironmentVariable("MSSQL_USERNAME")}");
+                Console.WriteLine($"MSSQL_DATABASE: {Environment.GetEnvironmentVariable("MSSQL_DATABASE")}");
+
+                if (string.IsNullOrEmpty(server))
+                {
+                    throw new Exception("Les variables d'environnement SQL Server de Railway sont manquantes. Server est vide.");
+                }
+
+                var connectionString = $"Server={server},{port};Database={database};User Id={username};Password={dbPassword};TrustServerCertificate=True;Encrypt=True;Connection Timeout=30;";
+                Console.WriteLine($"Connection String généré: Server={server},{port};Database={database};User Id={username};Password=***;...");
+
+                return connectionString;
+            }
+            else if (app.Environment.EnvironmentName == "Docker")
+            {
+                Console.WriteLine("Configuration Docker détectée (WebApplication)");
+                return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
+            }
+            else
+            {
+                Console.WriteLine("Configuration locale détectée (WebApplication)");
+                var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
                     ?? throw new Exception("DefaultConnection string is missing.");
 
                 return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
