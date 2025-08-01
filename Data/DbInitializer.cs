@@ -100,8 +100,6 @@ namespace BookingSystem.Data
         {
             var connectionString = GetConnectionString(app);
 
-            // Sur Railway, Entity Framework gère automatiquement la création de base de données
-            // Pour local et Docker, créer la base si nécessaire
             if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") == null)
             {
                 await CreateDatabaseIfNotExists(connectionString);
@@ -320,39 +318,7 @@ namespace BookingSystem.Data
                          ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
 
             Console.WriteLine($"DB_PASSWORD trouvé: {!string.IsNullOrEmpty(dbPassword)}");
-            Console.WriteLine($"RAILWAY_ENVIRONMENT: {Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT")}");
-
-            if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
-            {
-                Console.WriteLine("Configuration Railway détectée");
-
-                // Utiliser PRIORITAIREMENT les variables publiques pour Railway
-                var server = Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")
-                            ?? Environment.GetEnvironmentVariable("MSSQL_SERVER");
-                var port = Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")
-                          ?? Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")
-                          ?? "1433";
-                var username = Environment.GetEnvironmentVariable("MSSQL_USERNAME") ?? "sa";
-                var database = Environment.GetEnvironmentVariable("MSSQL_DATABASE") ?? "master";
-
-                Console.WriteLine($"MSSQL_SERVER: {Environment.GetEnvironmentVariable("MSSQL_SERVER")}");
-                Console.WriteLine($"MSSQL_SERVER_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")}");
-                Console.WriteLine($"MSSQL_TCP_PORT: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")}");
-                Console.WriteLine($"MSSQL_TCP_PORT_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")}");
-                Console.WriteLine($"MSSQL_USERNAME: {Environment.GetEnvironmentVariable("MSSQL_USERNAME")}");
-                Console.WriteLine($"MSSQL_DATABASE: {Environment.GetEnvironmentVariable("MSSQL_DATABASE")}");
-
-                if (string.IsNullOrEmpty(server))
-                {
-                    throw new Exception("Les variables d'environnement SQL Server de Railway sont manquantes. Server est vide.");
-                }
-
-                var connectionString = $"Server={server},{port};Database={database};User Id={username};Password={dbPassword};TrustServerCertificate=True;Encrypt=True;Connection Timeout=30;";
-                Console.WriteLine($"Connection String généré: Server={server},{port};Database={database};User Id={username};Password=***;...");
-
-                return connectionString;
-            }
-            else if (builder.Environment.EnvironmentName == "Docker")
+            if (builder.Environment.EnvironmentName == "Docker")
             {
                 Console.WriteLine("Configuration Docker détectée");
                 return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
@@ -376,40 +342,8 @@ namespace BookingSystem.Data
                          ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
 
             Console.WriteLine($"DB_PASSWORD trouvé: {!string.IsNullOrEmpty(dbPassword)}");
-            Console.WriteLine($"RAILWAY_ENVIRONMENT: {Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT")}");
 
-            // Vérifier si on est sur Railway
-            if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
-            {
-                Console.WriteLine("Configuration Railway détectée (WebApplication)");
-
-                // Utiliser PRIORITAIREMENT les variables publiques pour Railway
-                var server = Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")
-                            ?? Environment.GetEnvironmentVariable("MSSQL_SERVER");
-                var port = Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")
-                          ?? Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")
-                          ?? "1433";
-                var username = Environment.GetEnvironmentVariable("MSSQL_USERNAME") ?? "sa";
-                var database = Environment.GetEnvironmentVariable("MSSQL_DATABASE") ?? "master";
-
-                Console.WriteLine($"MSSQL_SERVER: {Environment.GetEnvironmentVariable("MSSQL_SERVER")}");
-                Console.WriteLine($"MSSQL_SERVER_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC")}");
-                Console.WriteLine($"MSSQL_TCP_PORT: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT")}");
-                Console.WriteLine($"MSSQL_TCP_PORT_PUBLIC: {Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC")}");
-                Console.WriteLine($"MSSQL_USERNAME: {Environment.GetEnvironmentVariable("MSSQL_USERNAME")}");
-                Console.WriteLine($"MSSQL_DATABASE: {Environment.GetEnvironmentVariable("MSSQL_DATABASE")}");
-
-                if (string.IsNullOrEmpty(server))
-                {
-                    throw new Exception("Les variables d'environnement SQL Server de Railway sont manquantes. Server est vide.");
-                }
-
-                var connectionString = $"Server={server},{port};Database={database};User Id={username};Password={dbPassword};TrustServerCertificate=True;Encrypt=True;Connection Timeout=30;";
-                Console.WriteLine($"Connection String généré: Server={server},{port};Database={database};User Id={username};Password=***;...");
-
-                return connectionString;
-            }
-            else if (app.Environment.EnvironmentName == "Docker")
+            if (app.Environment.EnvironmentName == "Docker")
             {
                 Console.WriteLine("Configuration Docker détectée (WebApplication)");
                 return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
