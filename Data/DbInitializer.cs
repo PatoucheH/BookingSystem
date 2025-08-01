@@ -19,7 +19,7 @@ namespace BookingSystem.Data
         /// <summary>
         /// Configure all services for the application
         /// </summary>
-        public static Task ConfigureServices(WebApplicationBuilder builder)
+        public static async Task ConfigureServices(WebApplicationBuilder builder)
         {
             // Configuration de la base de données
             var connectionString = GetConnectionString(builder);
@@ -58,8 +58,6 @@ namespace BookingSystem.Data
 
             // Configuration Stripe
             ConfigureStripe(builder);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -341,21 +339,15 @@ namespace BookingSystem.Data
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
                          ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
 
-            Console.WriteLine($"DB_PASSWORD trouvé: {!string.IsNullOrEmpty(dbPassword)}");
-
             if (app.Environment.EnvironmentName == "Docker")
             {
-                Console.WriteLine("Configuration Docker détectée (WebApplication)");
                 return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
             }
-            else
-            {
-                Console.WriteLine("Configuration locale détectée (WebApplication)");
-                var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
-                    ?? throw new Exception("DefaultConnection string is missing.");
 
-                return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
-            }
+            var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new Exception("DefaultConnection string is missing.");
+
+            return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
         }
 
         /// <summary>
