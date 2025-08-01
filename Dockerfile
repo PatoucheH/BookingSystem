@@ -15,6 +15,4 @@ RUN dotnet publish "BookingSystem.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# Copier explicitement le fichier appsettings.Docker.json
-COPY appsettings.Docker.json .
 ENTRYPOINT ["dotnet", "BookingSystem.dll"]

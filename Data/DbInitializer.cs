@@ -331,31 +331,31 @@ namespace BookingSystem.Data
                          ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
             if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
             {
-                var railwayDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL")
-                    ?? throw new Exception("the env variable DATABASE_URL is unavailable on railway ");
+                var server = Environment.GetEnvironmentVariable("MSSQL_SERVER_PUBLIC") ?? Environment.GetEnvironmentVariable("MSSQL_SERVER");
+                var port = Environment.GetEnvironmentVariable("MSSQL_TCP_PORT_PUBLIC") ?? Environment.GetEnvironmentVariable("MSSQL_TCP_PORT") ?? "1433";
+                var username = Environment.GetEnvironmentVariable("MSSQL_USERNAME") ?? "sa";
+                var database = Environment.GetEnvironmentVariable("MSSQL_DATABASE") ?? "BookingDB";
 
-                var railwayConnectionString = ConvertRailwayUrlToConnectionString(railwayDbUrl, dbPassword);
-                return railwayConnectionString;
+                if (string.IsNullOrEmpty(server))
+                {
+                    throw new Exception("Les variables d'environnement SQL Server de Railway sont manquantes.");
+                }
+
+                return $"Server={server},{port};Database={database};User Id={username};Password={dbPassword};TrustServerCertificate=True;Encrypt=True;Connection Timeout=30;";
             }
             else if (app.Environment.EnvironmentName == "Docker")
             {
                 return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
             }
-            else
-            {
                 var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
                     ?? throw new Exception("DefaultConnection string is missing.");
 
                 return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
-            }
 
         }
 
         private static string ConvertRailwayUrlToConnectionString(string railwayDbUrl, string dbPassword)
         {
-            // Exemple d'URL Railway : postgresql://postgres:password@host:port/database
-            // Pour SQL Server, l'URL pourrait être : sqlserver://username:password@host:port;database=databaseName
-
             // Analyser l'URL Railway
             var uri = new Uri(railwayDbUrl);
             var userInfo = uri.UserInfo.Split(':');
