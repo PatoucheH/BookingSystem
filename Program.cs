@@ -31,6 +31,8 @@ namespace BookingSystem
                 .AddEnvironmentVariables();
 
             Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+            Console.WriteLine($"Railway Environment: {Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT")}");
+
 
             // Configuration des services via DbInitializer
             await DbInitializer.ConfigureServices(builder);
@@ -44,8 +46,14 @@ namespace BookingSystem
             await DbInitializer.InitializeApplication(app);
 
             Console.WriteLine("Application starting...");
+
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+
+
             if (app.Environment.IsDevelopment())
                 app.Run();
+            else if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
+                app.Run($"http://0.0.0.0:{port}");
             else
                 app.Run("http://0.0.0.0:80");
         }
