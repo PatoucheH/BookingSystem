@@ -17,13 +17,13 @@ namespace BookingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Chargement du .env seulement en développement local
+            // loading .env only in local
             if (builder.Environment.IsDevelopment() && !builder.Environment.EnvironmentName.Equals("Docker"))
             {
                 DotNetEnv.Env.Load();
             }
 
-            // Configuration centralisée
+            // Configuration centralised
             builder.Configuration
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -34,7 +34,7 @@ namespace BookingSystem
             Console.WriteLine($"Railway Environment: {Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT")}");
 
 
-            // Configuration des services via DbInitializer
+            // Configuration  services via DbInitializer
             await DbInitializer.ConfigureServices(builder);
 
             var app = builder.Build();
@@ -42,18 +42,11 @@ namespace BookingSystem
             // Configuration du pipeline via DbInitializer
             DbInitializer.ConfigurePipeline(app);
 
-            // Initialisation complète de la base de données via DbInitializer
+            // Initialisation database via DbInitializer
             await DbInitializer.InitializeApplication(app);
-
-            Console.WriteLine("Application starting...");
-
-            var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
-
 
             if (app.Environment.IsDevelopment())
                 app.Run();
-            else if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
-                app.Run($"http://0.0.0.0:{port}");
             else
                 app.Run("http://0.0.0.0:80");
         }

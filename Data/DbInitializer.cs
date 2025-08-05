@@ -21,14 +21,14 @@ namespace BookingSystem.Data
         /// </summary>
         public static async Task ConfigureServices(WebApplicationBuilder builder)
         {
-            // Configuration de la base de données
+            // Configuration database
             var connectionString = GetConnectionString(builder);
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            // Configuration Identity avec rôles
+            // Configuration Identity with rôles
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -36,13 +36,13 @@ namespace BookingSystem.Data
 
             builder.Services.AddHttpContextAccessor();
 
-            // Enregistrement des services
+            // Saving services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPropertyService, PropertyService>();
             builder.Services.AddTransient<IEmailSender, FakeEmailSender>();
             builder.Services.AddScoped<PropertyService>();
 
-            // Configuration des cookies
+            // Configuration cookies
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
@@ -67,14 +67,9 @@ namespace BookingSystem.Data
         {
             // Middleware configuration
             if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
-            }
             else
-            {
                 app.UseMigrationsEndPoint();
-            }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -99,13 +94,7 @@ namespace BookingSystem.Data
             var connectionString = GetConnectionString(app);
 
             if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") == null)
-            {
                 await CreateDatabaseIfNotExists(connectionString);
-            }
-            else
-            {
-                Console.WriteLine("Railway environment detected - using Entity Framework migrations for database management");
-            }
 
             using var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
@@ -163,11 +152,11 @@ namespace BookingSystem.Data
         /// </summary>
         public static async Task Initialize(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            // Appliquer les migrations
+            // apply migrations
             await context.Database.MigrateAsync();
             Console.WriteLine("Migrations applied successfully");
 
-            // Créer les rôles
+            // Create roles
             string[] roles = new[] { "Admin", "Owner", "Guest" };
             foreach (var role in roles)
             {
@@ -178,7 +167,7 @@ namespace BookingSystem.Data
                 }
             }
 
-            // Créer les utilisateurs si la table Users est vide
+            // create users if user table is empty
             if (!await userManager.Users.AnyAsync())
             {
                 var user1 = new ApplicationUser
@@ -194,7 +183,7 @@ namespace BookingSystem.Data
                     EmailConfirmed = true
                 };
 
-                // Créer les utilisateurs et assigner les rôles
+                // Créer users and roles
                 await userManager.CreateAsync(user1, "Hugo123!");
                 await userManager.CreateAsync(user2, "Martin123!");
 
@@ -203,7 +192,7 @@ namespace BookingSystem.Data
 
                 Console.WriteLine("Default admin users created");
 
-                // Créer les propriétés de test
+                // create test property
                 var properties = new Property[]
                 {
                     new Property
@@ -234,8 +223,6 @@ namespace BookingSystem.Data
 
                 await context.Properties.AddRangeAsync(properties);
                 await context.SaveChangesAsync();
-
-                Console.WriteLine("Default properties created");
             }
         }
 
@@ -365,14 +352,14 @@ namespace BookingSystem.Data
             Console.WriteLine($"Stripe Secret Key loaded: OK (length: {stripeSecretKey.Length})");
             Console.WriteLine($"Stripe Publishable Key loaded: {(string.IsNullOrEmpty(stripePublishableKey) ? "NOT FOUND" : "OK")}");
 
-            // Configuration StripeSettings pour l'injection de dépendance
+            // Configuration StripeSettings for DI
             builder.Services.Configure<StripeSettings>(options =>
             {
                 options.SecretKey = stripeSecretKey;
                 options.PublishableKey = stripePublishableKey;
             });
 
-            // Configuration globale de Stripe
+            // Configuration stripe
             StripeConfiguration.ApiKey = stripeSecretKey;
         }
     }
