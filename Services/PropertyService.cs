@@ -18,7 +18,9 @@ namespace BookingSystem.Services
 
         Task<PropertyDTO> CreateProperty(PropertyDTO propertyDTO, string userId);
         Task<Property?> GetPropertyById(int id);
+        Task<PropertyDTO?> GetPropertyDTOById(int id);
         Task UpdateAsync(Property property);
+        Task<bool> DeleteProperty(int id);
         Task<bool> RatingProperty(int id, Rating rating);
     }
 

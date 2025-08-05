@@ -19,12 +19,12 @@ namespace BookingSystem.Controllers
     /// </summary>
     public class PropertyController : Controller
     {
-        private readonly PropertyService _propertyService;
+        private readonly IPropertyService _propertyService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<BookingHub> _hubContext;
 
-        public PropertyController (PropertyService propertyService, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHubContext<BookingHub> hubContext)
+        public PropertyController (IPropertyService propertyService, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHubContext<BookingHub> hubContext)
         {
             _propertyService = propertyService;
             _userManager = userManager;

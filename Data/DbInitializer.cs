@@ -22,7 +22,7 @@ namespace BookingSystem.Data
         public static async Task ConfigureServices(WebApplicationBuilder builder)
         {
             // Configuration database
-            var connectionString = GetConnectionString(builder);
+            var connectionString = GetConnectionString(builder.Configuration, builder.Environment);
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
@@ -90,10 +90,7 @@ namespace BookingSystem.Data
         /// </summary>
         public static async Task InitializeApplication(WebApplication app)
         {
-            var connectionString = GetConnectionString(app);
-
-            if (Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") == null)
-                await CreateDatabaseIfNotExists(connectionString);
+            var connectionString = GetConnectionString(app.Configuration, app.Environment);
 
             using var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
@@ -210,98 +207,24 @@ namespace BookingSystem.Data
         }
 
         /// <summary>
-        /// Create database if it doesn't exist (pour local et Docker uniquement)
-        /// </summary>
-        private static async Task CreateDatabaseIfNotExists(string connectionString)
-        {
-            try
-            {
-                var builder = new SqlConnectionStringBuilder(connectionString);
-                var databaseName = builder.InitialCatalog;
-
-                builder.InitialCatalog = "master";
-                var masterConnectionString = builder.ConnectionString;
-
-                var retryCount = 0;
-                const int maxRetries = 10;
-
-                while (retryCount < maxRetries)
-                {
-                    try
-                    {
-                        using var connection = new SqlConnection(masterConnectionString);
-                        await connection.OpenAsync();
-
-                        var checkCommand = new SqlCommand($"SELECT COUNT(*) FROM sys.databases WHERE name = @dbName", connection);
-                        checkCommand.Parameters.AddWithValue("@dbName", databaseName);
-
-                        var exists = (int)await checkCommand.ExecuteScalarAsync() > 0;
-
-                        if (!exists)
-                        {
-                            var createCommand = new SqlCommand($"CREATE DATABASE [{databaseName}]", connection);
-                            await createCommand.ExecuteNonQueryAsync();
-                        }
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        retryCount++;
-                        Console.WriteLine($"Failed to create database (attempt {retryCount}/{maxRetries}): {ex.Message}");
-
-                        if (retryCount >= maxRetries)
-                        {
-                            throw new Exception($"Failed to create database after {maxRetries} attempts", ex);
-                        }
-                        await Task.Delay(5000);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Get the appropriate connection string based on environment
         /// </summary>
-        private static string GetConnectionString(WebApplicationBuilder builder)
+        private static string GetConnectionString(IConfiguration configuration, IHostEnvironment environment)
         {
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                         ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
+                ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
 
-            if (builder.Environment.EnvironmentName == "Docker")
-            {
-                return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
-            }
-            else
-            {
-                var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                    ?? throw new Exception("DefaultConnection string is missing.");
-
-                return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
-            }
-        }
-
-        /// <summary>
-        /// Get connection string from built application
-        /// </summary>
-        private static string GetConnectionString(WebApplication app)
-        {
-            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                         ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
-
-            if (app.Environment.EnvironmentName == "Docker")
+            if (environment.EnvironmentName == "Docker")
             {
                 return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
             }
 
-            var rawConnectionString = app.Configuration.GetConnectionString("DefaultConnection")
+            var rawConnectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new Exception("DefaultConnection string is missing.");
 
             return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
         }
+
 
         /// <summary>
         /// Configure Stripe settings

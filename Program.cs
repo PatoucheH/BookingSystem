@@ -31,9 +31,6 @@ namespace BookingSystem
                 .AddEnvironmentVariables();
 
             Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
-            Console.WriteLine($"Railway Environment: {Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT")}");
-
-
             // Configuration  services via DbInitializer
             await DbInitializer.ConfigureServices(builder);
 
