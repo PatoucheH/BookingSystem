@@ -40,7 +40,6 @@ namespace BookingSystem.Data
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPropertyService, PropertyService>();
             builder.Services.AddTransient<IEmailSender, FakeEmailSender>();
-            builder.Services.AddScoped<PropertyService>();
 
             // Configuration cookies
             builder.Services.ConfigureApplicationCookie(options =>
@@ -109,39 +108,27 @@ namespace BookingSystem.Data
             {
                 try
                 {
-                    Console.WriteLine($"Database initialization attempt {retry + 1}/{maxRetries}");
-
                     var canConnect = await context.Database.CanConnectAsync();
-                    Console.WriteLine($"Can connect to database: {canConnect}");
 
                     if (canConnect)
                     {
                         await Initialize(context, userManager, roleManager);
-                        Console.WriteLine("Database initialization completed successfully");
                         break;
                     }
                     else
-                    {
                         throw new Exception("Cannot connect to database");
-                    }
                 }
                 catch (Exception ex)
                 {
                     retry++;
-                    Console.WriteLine($"Failed attempt {retry}: {ex.Message}");
-                    Console.WriteLine($"Exception type: {ex.GetType().Name}");
                     if (ex.InnerException != null)
                     {
                         Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
                     }
 
                     if (retry >= maxRetries)
-                    {
-                        Console.WriteLine("Max retries reached. Throwing exception.");
                         throw;
-                    }
 
-                    Console.WriteLine("Waiting 10 seconds before retry...");
                     await Task.Delay(10000);
                 }
             }
@@ -154,17 +141,13 @@ namespace BookingSystem.Data
         {
             // apply migrations
             await context.Database.MigrateAsync();
-            Console.WriteLine("Migrations applied successfully");
 
             // Create roles
             string[] roles = new[] { "Admin", "Owner", "Guest" };
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
-                {
                     await roleManager.CreateAsync(new IdentityRole(role));
-                    Console.WriteLine($"Role '{role}' created");
-                }
             }
 
             // create users if user table is empty
@@ -233,11 +216,8 @@ namespace BookingSystem.Data
         {
             try
             {
-                Console.WriteLine("Creating database if it doesn't exist...");
-
                 var builder = new SqlConnectionStringBuilder(connectionString);
                 var databaseName = builder.InitialCatalog;
-                Console.WriteLine($"Target database name: {databaseName}");
 
                 builder.InitialCatalog = "master";
                 var masterConnectionString = builder.ConnectionString;
@@ -251,7 +231,6 @@ namespace BookingSystem.Data
                     {
                         using var connection = new SqlConnection(masterConnectionString);
                         await connection.OpenAsync();
-                        Console.WriteLine("Connected to master database successfully");
 
                         var checkCommand = new SqlCommand($"SELECT COUNT(*) FROM sys.databases WHERE name = @dbName", connection);
                         checkCommand.Parameters.AddWithValue("@dbName", databaseName);
@@ -260,16 +239,9 @@ namespace BookingSystem.Data
 
                         if (!exists)
                         {
-                            Console.WriteLine($"Database {databaseName} doesn't exist. Creating it...");
                             var createCommand = new SqlCommand($"CREATE DATABASE [{databaseName}]", connection);
                             await createCommand.ExecuteNonQueryAsync();
-                            Console.WriteLine($"Database {databaseName} created successfully");
                         }
-                        else
-                        {
-                            Console.WriteLine($"Database {databaseName} already exists");
-                        }
-
                         break;
                     }
                     catch (Exception ex)
@@ -281,15 +253,12 @@ namespace BookingSystem.Data
                         {
                             throw new Exception($"Failed to create database after {maxRetries} attempts", ex);
                         }
-
-                        Console.WriteLine("Waiting 5 seconds before retry...");
                         await Task.Delay(5000);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in CreateDatabaseIfNotExists: {ex.Message}");
                 throw;
             }
         }
@@ -302,15 +271,12 @@ namespace BookingSystem.Data
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
                          ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
 
-            Console.WriteLine($"DB_PASSWORD trouvé: {!string.IsNullOrEmpty(dbPassword)}");
             if (builder.Environment.EnvironmentName == "Docker")
             {
-                Console.WriteLine("Configuration Docker détectée");
                 return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
             }
             else
             {
-                Console.WriteLine("Configuration locale détectée");
                 var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                     ?? throw new Exception("DefaultConnection string is missing.");
 
@@ -346,11 +312,7 @@ namespace BookingSystem.Data
             var stripePublishableKey = Environment.GetEnvironmentVariable("STRIPE_PUBLISHABLE_KEY");
 
             if (string.IsNullOrEmpty(stripeSecretKey))
-            {
                 throw new Exception("La variable d'environnement STRIPE_SECRET_KEY est manquante.");
-            }
-            Console.WriteLine($"Stripe Secret Key loaded: OK (length: {stripeSecretKey.Length})");
-            Console.WriteLine($"Stripe Publishable Key loaded: {(string.IsNullOrEmpty(stripePublishableKey) ? "NOT FOUND" : "OK")}");
 
             // Configuration StripeSettings for DI
             builder.Services.Configure<StripeSettings>(options =>
