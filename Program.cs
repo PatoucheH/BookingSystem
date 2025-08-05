@@ -36,6 +36,10 @@ namespace BookingSystem
 
             var app = builder.Build();
 
+            app.Services.CreateScope().ServiceProvider
+                .GetRequiredService<ApplicationDbContext>()
+                .Database.Migrate();
+
             // Configuration du pipeline via DbInitializer
             DbInitializer.ConfigurePipeline(app);
 
