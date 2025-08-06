@@ -17,13 +17,13 @@ namespace BookingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // loading .env only in local
+            // Loading .env only in local
             if (builder.Environment.IsDevelopment() && !builder.Environment.EnvironmentName.Equals("Docker"))
             {
                 DotNetEnv.Env.Load();
             }
 
-            // Configuration centralised
+            // Configuration centralisée
             builder.Configuration
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -31,19 +31,16 @@ namespace BookingSystem
                 .AddEnvironmentVariables();
 
             Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
-            // Configuration  services via DbInitializer
+
+            // Configuration services via DbInitializer
             await DbInitializer.ConfigureServices(builder);
 
             var app = builder.Build();
 
-            app.Services.CreateScope().ServiceProvider
-                .GetRequiredService<ApplicationDbContext>()
-                .Database.Migrate();
-
             // Configuration du pipeline via DbInitializer
             DbInitializer.ConfigurePipeline(app);
-
-            // Initialisation database via DbInitializer
+             
+            // Initialisation database via DbInitializer 
             await DbInitializer.InitializeApplication(app);
 
             if (app.Environment.IsDevelopment())

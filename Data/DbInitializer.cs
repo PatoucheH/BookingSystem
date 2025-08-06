@@ -5,8 +5,8 @@ using BookingSystem.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Stripe;
 
 namespace BookingSystem.Data
@@ -24,7 +24,7 @@ namespace BookingSystem.Data
             // Configuration database
             var connectionString = GetConnectionString(builder.Configuration, builder.Environment);
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseNpgsql(connectionString));
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -90,43 +90,68 @@ namespace BookingSystem.Data
         /// </summary>
         public static async Task InitializeApplication(WebApplication app)
         {
-            var connectionString = GetConnectionString(app.Configuration, app.Environment);
-
             using var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
-            var context = services.GetRequiredService<ApplicationDbContext>();
-            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            var logger = services.GetRequiredService<ILogger<DbInitializer>>();
 
+            try
+            {
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                await WaitForDatabase(context, logger);
+                await Initialize(context, userManager, roleManager);
+
+                logger.LogInformation("Database initialization completed successfully");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred during database initialization");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Wait for database to be ready with retry logic
+        /// </summary>
+        private static async Task WaitForDatabase(ApplicationDbContext context, ILogger logger)
+        {
             var retry = 0;
-            const int maxRetries = 15;
+            const int maxRetries = 30; 
+            const int delayMs = 5000;
 
             while (retry < maxRetries)
             {
                 try
                 {
-                    var canConnect = await context.Database.CanConnectAsync();
+                    logger.LogInformation($"Attempting to connect to database (attempt {retry + 1}/{maxRetries})");
 
+                    var canConnect = await context.Database.CanConnectAsync();
                     if (canConnect)
                     {
-                        await Initialize(context, userManager, roleManager);
-                        break;
+                        logger.LogInformation("Successfully connected to database");
+                        return;
                     }
                     else
-                        throw new Exception("Cannot connect to database");
+                        throw new Exception("Cannot connect to database - CanConnectAsync returned false");
                 }
                 catch (Exception ex)
                 {
                     retry++;
+                    logger.LogWarning($"Database connection attempt {retry} failed: {ex.Message}");
+
                     if (ex.InnerException != null)
-                    {
-                        Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                    }
+                        logger.LogWarning($"Inner exception: {ex.InnerException.Message}");
 
                     if (retry >= maxRetries)
-                        throw;
+                    {
+                        logger.LogError($"Failed to connect to database after {maxRetries} attempts");
+                        throw new Exception($"Could not connect to database after {maxRetries} attempts. Last error: {ex.Message}", ex);
+                    }
 
-                    await Task.Delay(10000);
+                    logger.LogInformation($"Waiting {delayMs}ms before retry...");
+                    await Task.Delay(delayMs);
                 }
             }
         }
@@ -136,73 +161,104 @@ namespace BookingSystem.Data
         /// </summary>
         public static async Task Initialize(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            // apply migrations
-            await context.Database.MigrateAsync();
-
-            // Create roles
-            string[] roles = new[] { "Admin", "Owner", "Guest" };
-            foreach (var role in roles)
+            try
             {
-                if (!await roleManager.RoleExistsAsync(role))
-                    await roleManager.CreateAsync(new IdentityRole(role));
-            }
+                // Apply migrations
+                Console.WriteLine("Applying database migrations...");
+                await context.Database.MigrateAsync();
+                Console.WriteLine("Migrations applied successfully");
 
-            // create users if user table is empty
-            if (!await userManager.Users.AnyAsync())
-            {
-                var user1 = new ApplicationUser
+                // Create roles
+                string[] roles = new[] { "Admin", "Owner", "Guest" };
+                foreach (var role in roles)
                 {
-                    UserName = "hugo@admin.com",
-                    Email = "hugo@admin.com",
-                    EmailConfirmed = true
-                };
-                var user2 = new ApplicationUser
-                {
-                    UserName = "martin.admin",
-                    Email = "martin@admin.com",
-                    EmailConfirmed = true
-                };
-
-                // Créer users and roles
-                await userManager.CreateAsync(user1, "Hugo123!");
-                await userManager.CreateAsync(user2, "Martin123!");
-
-                await userManager.AddToRoleAsync(user1, "Admin");
-                await userManager.AddToRoleAsync(user2, "Admin");
-
-                Console.WriteLine("Default admin users created");
-
-                // create test property
-                var properties = new Property[]
-                {
-                    new Property
+                    if (!await roleManager.RoleExistsAsync(role))
                     {
-                        Town = "Bruxelles",
-                        Country = "Belgium",
-                        Type = PropertyType.Hotel,
-                        Description = "blablabla",
-                        Title = "Beautiful hotel",
-                        Price = 150,
-                        GuestNbr = 2,
-                        Photo = "/css/assets/Patou_logo.png",
-                        OwnerId = user1.Id
-                    },
-                    new Property
-                    {
-                        Town = "Charleroi",
-                        Country = "Belgium",
-                        Type = PropertyType.Hotel,
-                        Description = "lololol",
-                        Title = "Big hotel",
-                        Price = 100,
-                        GuestNbr = 4,
-                        Photo = "/css/assets/Patou_logo.png",
-                        OwnerId = user1.Id
+                        var result = await roleManager.CreateAsync(new IdentityRole(role));
+                        if (result.Succeeded)
+                            Console.WriteLine($"Role '{role}' created successfully");
+                        else
+                            Console.WriteLine($"Failed to create role '{role}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
                     }
-                };
+                    else
+                        Console.WriteLine($"Role '{role}' already exists");
+                }
 
-                await context.Properties.AddRangeAsync(properties);
-                await context.SaveChangesAsync();
+                // Create users if user table is empty
+                if (!await userManager.Users.AnyAsync())
+                {
+                    var user1 = new ApplicationUser
+                    {
+                        UserName = "hugo@admin.com",
+                        Email = "hugo@admin.com",
+                        EmailConfirmed = true
+                    };
+
+                    var user2 = new ApplicationUser
+                    {
+                        UserName = "martin.admin",
+                        Email = "martin@admin.com",
+                        EmailConfirmed = true
+                    };
+
+                    // Create users
+                    var user1Result = await userManager.CreateAsync(user1, "Hugo123!");
+                    var user2Result = await userManager.CreateAsync(user2, "Martin123!");
+
+                    if (user1Result.Succeeded && user2Result.Succeeded)
+                    {
+                        // Add roles to users
+                        await userManager.AddToRoleAsync(user1, "Admin");
+                        await userManager.AddToRoleAsync(user2, "Admin");
+
+                        Console.WriteLine("Default admin users created successfully");
+
+                        // Create test properties
+                        var properties = new Property[]
+                        {
+                            new Property
+                            {
+                                Town = "Bruxelles",
+                                Country = "Belgium",
+                                Type = PropertyType.Hotel,
+                                Description = "blablabla",
+                                Title = "Beautiful hotel",
+                                Price = 150,
+                                GuestNbr = 2,
+                                Photo = "/css/assets/Patou_logo.png",
+                                OwnerId = user1.Id
+                            },
+                            new Property
+                            {
+                                Town = "Charleroi",
+                                Country = "Belgium",
+                                Type = PropertyType.Hotel,
+                                Description = "lololol",
+                                Title = "Big hotel",
+                                Price = 100,
+                                GuestNbr = 4,
+                                Photo = "/css/assets/Patou_logo.png",
+                                OwnerId = user1.Id
+                            }
+                        };
+
+                        await context.Properties.AddRangeAsync(properties);
+                        await context.SaveChangesAsync();
+
+                        Console.WriteLine("Test properties created successfully");
+                    }
+                    else
+                        Console.WriteLine($"Failed to create users: {string.Join(", ", user1Result.Errors.Concat(user2Result.Errors).Select(e => e.Description))}");
+                }
+                else
+                    Console.WriteLine("Users already exist, skipping user creation");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during database initialization: {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                throw;
             }
         }
 
@@ -211,20 +267,26 @@ namespace BookingSystem.Data
         /// </summary>
         private static string GetConnectionString(IConfiguration configuration, IHostEnvironment environment)
         {
-            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
-                ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
-
-            if (environment.EnvironmentName == "Docker")
+            try
             {
-                return $"Server=db,1433;Database=BookingDB;User Id=sa;Password={dbPassword};TrustServerCertificate=True;Encrypt=True;";
+                var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
+                    ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
+
+                var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+                var port = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+                var user = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
+                var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "BookingDB";
+
+                var connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={dbPassword};Include Error Detail=true;";
+
+                return connectionString;
             }
-
-            var rawConnectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new Exception("DefaultConnection string is missing.");
-
-            return rawConnectionString.Replace("__DB_PASSWORD__", dbPassword);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error building connection string: {ex.Message}");
+                throw;
+            }
         }
-
 
         /// <summary>
         /// Configure Stripe settings
@@ -235,7 +297,7 @@ namespace BookingSystem.Data
             var stripePublishableKey = Environment.GetEnvironmentVariable("STRIPE_PUBLISHABLE_KEY");
 
             if (string.IsNullOrEmpty(stripeSecretKey))
-                throw new Exception("La variable d'environnement STRIPE_SECRET_KEY est manquante.");
+                throw new Exception("env variable STRIPE_SECRET_KEY is missing.");
 
             // Configuration StripeSettings for DI
             builder.Services.Configure<StripeSettings>(options =>

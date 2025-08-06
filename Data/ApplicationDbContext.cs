@@ -47,7 +47,7 @@ namespace BookingSystem.Data
 
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Property)
-                .WithMany() 
+                .WithMany(p => p.Bookings) 
                 .HasForeignKey(b => b.PropertyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -56,6 +56,7 @@ namespace BookingSystem.Data
                 .WithMany(p => p.Ratings)
                 .HasForeignKey(r => r.PropertyId)
                 .OnDelete(DeleteBehavior.Cascade);
+
         }
 
     }
