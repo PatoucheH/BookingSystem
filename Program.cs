@@ -33,7 +33,7 @@ namespace BookingSystem
             Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 
             // Configuration services via DbInitializer
-            await DbInitializer.ConfigureServices(builder);
+            DbInitializer.ConfigureServices(builder);
 
             var app = builder.Build();
 

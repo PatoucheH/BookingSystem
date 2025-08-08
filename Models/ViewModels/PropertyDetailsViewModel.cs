@@ -9,7 +9,7 @@ namespace BookingSystem.Models.ViewModels
     public class PropertyDetailsViewModel
     {
         public int Id { get; set; }
-        public PropertyDTO? Property { get; set; } = new();
-        public List<Booking>? Bookings { get; set; } = new();
+        public required PropertyDTO Property { get; set; }
+        public required List<Booking> Bookings { get; set; } = new();
     }
 }

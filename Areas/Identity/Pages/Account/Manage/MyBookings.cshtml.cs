@@ -8,17 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookingSystem.Areas.Identity.Pages.Account.Manage
 {
-    public class MyBookingsModel : PageModel
+    public class MyBookingsModel(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
-        public MyBookingsModel(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
-        {
-            _context = context;
-            _userManager = userManager;
-        }
-        public List<BookingDTO> Bookings { get; set; }
+        public List<BookingDTO>? Bookings { get; set; }
         public async Task<IActionResult> OnGet()
         {
             var userId = _userManager.GetUserId(User);

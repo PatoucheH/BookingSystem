@@ -19,7 +19,7 @@ namespace BookingSystem.Data
         /// <summary>
         /// Configure all services for the application
         /// </summary>
-        public static async Task ConfigureServices(WebApplicationBuilder builder)
+        public static void ConfigureServices(WebApplicationBuilder builder)
         {
             // Configuration database
             var connectionString = GetConnectionString(builder.Configuration, builder.Environment);

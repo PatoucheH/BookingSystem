@@ -2,14 +2,20 @@
 @using Microsoft.AspNetCore.Identity
 @using BookingSystem.Models
 @inject UserManager<ApplicationUser> UserManager
-@inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 
 @{
     ViewData["Title"] = "Personal Data";
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
+
+    string username = User.Identity?.Name ?? "";
+    List<string> userRoles = new();
+
     var user = await UserManager.GetUserAsync(User);
-    var roles = await UserManager.GetRolesAsync(user);
+    if(user is not null)
+    {
+        userRoles = (await UserManager.GetRolesAsync(user)).ToList();
+    }
 }
 
 
@@ -25,8 +31,8 @@
         Deleting this data will permanently remove your account, and this cannot be recovered.
     </p>
     <div class="text-center">
-        <p><strong>Username:</strong> @User.Identity.Name</p>
-        <p><strong>Roles:</strong> @string.Join(", ", roles)</p>
+        <p><strong>Username:</strong> @username</p>
+        <p><strong>Roles:</strong> @string.Join(", ", userRoles)</p>
     </div>
 </div>
 

@@ -51,7 +51,7 @@ namespace BookingSystem.Controllers
                 .Select(r => r.Value)
                 .ToListAsync();
 
-            property.AverageRating = (double)(ratings.Any() ? ratings.Average() : 0);
+            property.AverageRating = (ratings.Any() ? ratings.Average() : 0);
             var viewModel = new PropertyDetailsViewModel
             {
                 Id = id,

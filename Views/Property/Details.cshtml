@@ -38,7 +38,7 @@
         }
     </div>
     <div class="mb-2 flex flex-row items-center space-x-4 justify-evenly">
-        <p class="mb-0">Ratings : @Model.Property.AverageRating.ToString("0.0") / 5</p>
+        <p class="mb-0">Ratings : @Model.Property.AverageRating.ToString() / 5</p>
 
         <form method="post" asp-action="Rate" class="flex flex-row items-center space-x-2">
             <input type="hidden" name="propertyId" value="@Model.Property.Id" />

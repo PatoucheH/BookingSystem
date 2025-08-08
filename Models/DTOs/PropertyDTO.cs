@@ -17,6 +17,6 @@ namespace BookingSystem.Models.DTOs
         internal string? OwnerId { get; set; }
         public List<Rating>? Ratings { get; set; } = new();
         [NotMapped]
-        public double AverageRating { get; set; }
+        public double? AverageRating { get; set; }
     }
 }

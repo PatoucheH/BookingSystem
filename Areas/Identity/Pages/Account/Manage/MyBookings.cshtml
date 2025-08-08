@@ -20,28 +20,35 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var booking in Model.Bookings)
+                    @if(Model.Bookings is not null)
                     {
-                        <tr>
-                            <td class="border border-gray-300 px-4 py-2">@booking.Title</td>
-                            <td class="border border-gray-300 px-4 py-2">@booking.Town, @booking.Country</td>
-                            <td class="border border-gray-300 px-4 py-2">@booking.StartDate</td>
-                            <td class="border border-gray-300 px-4 py-2">@booking.EndDate</td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                @if(booking.StartDate > DateTime.Now)
-                                {
-                                    <span class="text-green-600 font-semibold">Incoming</span>
-                                }
-                                else if(booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
-                                {
-                                    <span class="text-amber-600 font-semibold">Ongoing</span>
-                                }
-                                else
-                                {
-                                    <span class="text-gray-600 font-semibold">Passed</span>
-                                }
-                            </td>
-                        </tr>
+                        @foreach (var booking in Model.Bookings)
+                        {
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">@booking.Title</td>
+                                <td class="border border-gray-300 px-4 py-2">@booking.Town, @booking.Country</td>
+                                <td class="border border-gray-300 px-4 py-2">@booking.StartDate</td>
+                                <td class="border border-gray-300 px-4 py-2">@booking.EndDate</td>
+                                <td class="border border-gray-300 px-4 py-2">
+                                    @if(booking.StartDate > DateTime.Now)
+                                    {
+                                        <span class="text-green-600 font-semibold">Incoming</span>
+                                    }
+                                    else if(booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
+                                    {
+                                        <span class="text-amber-600 font-semibold">Ongoing</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-600 font-semibold">Passed</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <p>No Reservation</p>
                     }
                 </tbody>
             </table>

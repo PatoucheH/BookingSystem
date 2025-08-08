@@ -5,17 +5,12 @@ using BookingSystem.Models;
 
 namespace BookingSystem.Pages.Properties
 {
-    public class EditModel : PageModel
+    public class EditModel(IPropertyService propertyService) : PageModel
     {
-        private readonly IPropertyService _propertyService;
-
-        public EditModel(IPropertyService propertyService)
-        {
-            _propertyService = propertyService;
-        }
+        private readonly IPropertyService _propertyService = propertyService;
 
         [BindProperty]
-        public Property Property { get; set; }
+        public required Property Property { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
