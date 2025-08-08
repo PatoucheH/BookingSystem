@@ -17,7 +17,7 @@ namespace BookingSystem.Models.ViewModels
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        public IEnumerable<PropertyDTO> Results { get; set; } = new List<PropertyDTO>();
+        public IEnumerable<PropertyDTO>? Results { get; set; } = new List<PropertyDTO>();
         public List<BookingDTO>? Bookings { get; set; } = new List<BookingDTO>();
     }
 }

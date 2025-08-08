@@ -4,6 +4,6 @@ namespace BookingSystem.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public List<Property> Properties { get; set; } = [];
+        public List<Property>? Properties { get; set; } = [];
     }
 }
