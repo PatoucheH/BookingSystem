@@ -43,10 +43,10 @@ namespace BookingSystem
             // Initialisation database via DbInitializer 
             await DbInitializer.InitializeApplication(app);
 
-            if (app.Environment.IsDevelopment())
+            //if (app.Environment.IsDevelopment())
                 app.Run();
-            else
-                app.Run("http://0.0.0.0:80");
+            //else
+            //    app.Run("http://0.0.0.0:80");
         }
     }
 }
