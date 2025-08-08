@@ -269,6 +269,16 @@ namespace BookingSystem.Data
         {
             try
             {
+                // first try azure
+                if (environment.IsProduction())
+                {
+                    var azureConnectionString = configuration.GetConnectionString("AZURE_POSTGRESQL_CONNECTIONSTRING");
+                    if (!string.IsNullOrEmpty(azureConnectionString))
+                    {
+                        return azureConnectionString + ";Include Error Detail=true;";
+                    }
+                }
+
                 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
                     ?? throw new Exception("La variable d'environnement DB_PASSWORD est manquante.");
 
