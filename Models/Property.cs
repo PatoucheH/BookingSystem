@@ -12,7 +12,7 @@ namespace BookingSystem.Models
         public PropertyType Type { get; set; }
         public string? Description { get; set; }
         public string? Title { get; set; }
-        public Double Price { get; set; }
+        public double? Price { get; set; }
         public string? Photo { get; set; }
         [NotMapped]
         public IFormFile? PhotoFile { get; set; }

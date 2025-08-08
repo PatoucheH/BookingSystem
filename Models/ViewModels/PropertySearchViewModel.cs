@@ -18,6 +18,6 @@ namespace BookingSystem.Models.ViewModels
         public DateTime? EndDate { get; set; }
 
         public IEnumerable<PropertyDTO> Results { get; set; } = new List<PropertyDTO>();
-        public List<BookingDTO?> Bookings { get; set; }
+        public List<BookingDTO>? Bookings { get; set; }
     }
 }
