@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 
-<div class="w-5/6 mx-auto bg-green-400 rounded-full mb-8">
+<div class="hidden min-[950px]:block w-5/6 mx-auto bg-green-400 rounded-full mb-8">
     <ul class="flex justify-center text-lg space-x-8">
         <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
             <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="inline-block font-semibold">Change the password</a>
@@ -27,10 +27,96 @@
         <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
             <a asp-area="Identity" asp-page="/Account/Manage/MyBookings" class="inline-block font-semibold">My Booking list</a>
         </li>
-        @* <li class="px-4 py-2 hover:scale-105 transition duration-200 text-center">
-            <a asp-page="./TwoFactorAuthentication" class="inline-block font-semibold">Two factors authentication</a>
-        </li> *@
     </ul>
 </div>
 
+<div class="min-[950px]:hidden mb-8">
+    <div class="flex justify-center">
+        <button onclick="toggleMobileMenu()"
+                class="bg-green-400 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-full transition duration-200 flex items-center space-x-2">
+            <span>Menu</span>
+            <svg id="menu-icon" class="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+            <svg id="close-icon" class="w-5 h-5 transition-transform duration-200 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
 
+    <div id="mobile-menu" class="hidden mt-4 w-5/6 mx-auto bg-green-400 rounded-3xl shadow-lg overflow-hidden">
+        <ul class="flex flex-col">
+            <li class="border-b border-green-300 last:border-b-0">
+                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword"
+                   class="block px-6 py-3 font-semibold hover:bg-green-300 transition duration-200">
+                    Change the password
+                </a>
+            </li>
+            <li class="border-b border-green-300 last:border-b-0">
+                <a asp-area="Identity" asp-page="/Account/Manage/Email"
+                   class="block px-6 py-3 font-semibold hover:bg-green-300 transition duration-200">
+                    Modify your email
+                </a>
+            </li>
+            <li class="border-b border-green-300 last:border-b-0">
+                <a asp-area="Identity" asp-page="/Account/Manage/DeletePersonalData"
+                   class="block px-6 py-3 font-semibold hover:bg-green-300 transition duration-200">
+                    Delete the account
+                </a>
+            </li>
+            @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Owner") || User.IsInRole("Admin")))
+            {
+                <li class="border-b border-green-300 last:border-b-0">
+                    <a asp-area="Identity" asp-page="/Account/Manage/MyProperties"
+                       class="block px-6 py-3 font-semibold hover:bg-green-300 transition duration-200">
+                        My Properties list
+                    </a>
+                </li>
+            }
+            @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+            {
+                <li class="border-b border-green-300 last:border-b-0">
+                    <a asp-controller="User" asp-action="Index"
+                       class="block px-6 py-3 font-semibold hover:bg-green-300 transition duration-200">
+                        List of all the users
+                    </a>
+                </li>
+            }
+            <li class="border-b border-green-300 last:border-b-0">
+                <a asp-area="Identity" asp-page="/Account/Manage/MyBookings"
+                   class="block px-6 py-3 font-semibold hover:bg-green-300 transition duration-200">
+                    My Booking list
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        const closeIcon = document.getElementById('close-icon');
+
+        if (menu.classList.contains('hidden')) {
+            menu.classList.remove('hidden');
+            menu.classList.add('animate-fade-in');
+            menuIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+        } else {
+            menu.classList.add('hidden');
+            menu.classList.remove('animate-fade-in');
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuLinks = document.querySelectorAll('#mobile-menu a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                toggleMobileMenu();
+            });
+        });
+    });
+</script>

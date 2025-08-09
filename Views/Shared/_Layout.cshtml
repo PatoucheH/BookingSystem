@@ -11,15 +11,19 @@
 <body class="bg-emerald-50">
     <header class="bg-green-400 rounded-b-[75px] max-h-[250px] min-h-[150px] px-4 py-2 flex items-center justify-between">
         <a asp-controller="Home" asp-action="index">
-            <div class="ml-[50px] transition duration-200 hover:scale-110">
-                <img src="~/css/assets/patou_name_logo.png" alt="logo" class="h-[120px] object-contain" />
+            <div class="ml-4 sm:ml-[50px] transition duration-200 hover:scale-110">
+                <img src="~/css/assets/patou_name_logo.png" alt="logo" class="h-[80px] sm:h-[120px] object-contain" />
             </div>
         </a>
+
         <a asp-controller="Home" asp-action="Index"
-           class="text-5xl font-bold tracking-wider items-center cursor-pointer transition duration-200 hover:scale-110">
+           class="hidden lg:block text-5xl font-bold tracking-wider items-center cursor-pointer transition duration-200 hover:scale-110">
             BOOK YOUR DREAM
         </a>
+
+        <div class="flex-shrink-0 text-xs min-[400px]:text-sm min-[500px]:text-base scale-85 min-[400px]:scale-90 min-[500px]:scale-100">
             <partial name="_LoginPartial" />
+        </div>
     </header>
 
     <div class="mx-auto" >
@@ -29,7 +33,7 @@
     </div>
 
     <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-green-400 p-5 font-bold w-5/6 rounded-t-[50px] text-center shadow-lg max-h-[50px]">
-        &copy; @DateTime.Now.Year - Booking System - By Martin Matin & Hugo l'escargot
+        &copy; 2025 - Booking System - By Patou
     </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -4,54 +4,93 @@
     ViewData["Title"] = "List Bookings";
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
 }
-
-<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-xl min-w-lg mx-auto">
+<div class="min-h-screen bg-gray-50 py-12 px-2 sm:px-4 lg:px-8">
+    <div class="max-w-full sm:max-w-6xl mx-auto">
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">List of all my bookings</h2>
-            <table class="table-auto border-collapse border border-gray-400 w-full">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="border border-gray-400 px-4 py-2">Title</th>
-                        <th class="border border-gray-400 px-4 py-2">Location</th>
-                        <th class="border border-gray-400 px-4 py-2">Start Date</th>
-                        <th class="border border-gray-400 px-4 py-2">End Date</th>
-                        <th class="border border-gray-400 px-4 py-2">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if(Model.Bookings is not null)
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">List of all my bookings</h2>
+
+            @if (Model.Bookings is not null && Model.Bookings.Any())
+            {
+                <div class="block sm:hidden space-y-4">
+                    @foreach (var booking in Model.Bookings)
                     {
-                        @foreach (var booking in Model.Bookings)
-                        {
+                        <div class="bg-white rounded-lg border border-gray-300 p-4 shadow-sm text-left">
+                            <div class="mb-2">
+                                <span class="text-sm font-semibold text-gray-600">Title:</span>
+                                <span class="text-sm">@booking.Title</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm font-semibold text-gray-600">Location:</span>
+                                <span class="text-sm">@booking.Town, @booking.Country</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm font-semibold text-gray-600">Period:</span>
+                                <span class="text-sm">@booking.StartDate?.ToString("dd/MM/yyyy") - @booking.EndDate?.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div>
+                                <span class="text-sm font-semibold text-gray-600">Status:</span>
+                                @if (booking.StartDate > DateTime.Now)
+                                {
+                                    <span class="text-green-600 font-semibold text-sm">Incoming</span>
+                                }
+                                else if (booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
+                                {
+                                    <span class="text-amber-600 font-semibold text-sm">Ongoing</span>
+                                }
+                                else
+                                {
+                                    <span class="text-gray-600 font-semibold text-sm">Passed</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="hidden sm:block overflow-x-auto">
+                    <table class="table-auto border-collapse border border-gray-400 w-full">
+                        <thead class="bg-gray-200">
                             <tr>
-                                <td class="border border-gray-300 px-4 py-2">@booking.Title</td>
-                                <td class="border border-gray-300 px-4 py-2">@booking.Town, @booking.Country</td>
-                                <td class="border border-gray-300 px-4 py-2">@booking.StartDate</td>
-                                <td class="border border-gray-300 px-4 py-2">@booking.EndDate</td>
-                                <td class="border border-gray-300 px-4 py-2">
-                                    @if(booking.StartDate > DateTime.Now)
-                                    {
-                                        <span class="text-green-600 font-semibold">Incoming</span>
-                                    }
-                                    else if(booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
-                                    {
-                                        <span class="text-amber-600 font-semibold">Ongoing</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-gray-600 font-semibold">Passed</span>
-                                    }
-                                </td>
+                                <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Title</th>
+                                <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Location</th>
+                                <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Start Date</th>
+                                <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">End Date</th>
+                                <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Status</th>
                             </tr>
-                        }
-                    }
-                    else
-                    {
-                        <p>No Reservation</p>
-                    }
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model.Bookings)
+                            {
+                                <tr>
+                                    <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@booking.Title</td>
+                                    <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@booking.Town, @booking.Country</td>
+                                    <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@booking.StartDate?.ToString("dd/MM/yyyy")</td>
+                                    <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@booking.EndDate?.ToString("dd/MM/yyyy")</td>
+                                    <td class="border border-gray-300 px-2 sm:px-4 py-2 text-center">
+                                        @if (booking.StartDate > DateTime.Now)
+                                        {
+                                            <span class="text-green-600 font-semibold text-sm">Incoming</span>
+                                        }
+                                        else if (booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
+                                        {
+                                            <span class="text-amber-600 font-semibold text-sm">Ongoing</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-gray-600 font-semibold text-sm">Passed</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-8">
+                    <p class="text-gray-600">No Reservation</p>
+                </div>
+            }
         </div>
     </div>
 </div>

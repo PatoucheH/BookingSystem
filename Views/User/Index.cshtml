@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<BookingSystem.Models.DTOs.UserDTO>
-
 @{
     ViewData["Title"] = "View User";
     Layout = "_ManageLayout";
@@ -14,38 +13,66 @@
         };
     }
 }
-
-
-<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-xl min-w-lg mx-auto">
+<div class="min-h-screen bg-gray-50 py-12 px-2 sm:px-4 lg:px-8">
+    <div class="max-w-full sm:max-w-4xl mx-auto">
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">List of all the users</h2>
-            <table class="table-auto border-collapse border border-gray-400 w-full">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="border border-gray-400 px-4 py-2">Username</th>
-                        <th class="border border-gray-400 px-4 py-2">Email</th>
-                        <th class="border border-gray-400 px-4 py-2">Roles</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in Model)
-                    {
-                        <tr>
-                            <td class="border border-gray-300 px-4 py-2">@user.Username</td>
-                            <td class="border border-gray-300 px-4 py-2">@user.Email</td>
-                            <td class="border border-gray-300 px-4 py-2">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">List of all the users</h2>
+
+            <div class="block sm:hidden space-y-4">
+                @foreach (var user in Model)
+                {
+                    <div class="bg-white rounded-lg border border-gray-300 p-4 shadow-sm">
+                        <div class="mb-2">
+                            <span class="text-sm font-semibold text-gray-600">Username:</span>
+                            <span class="text-sm">@user.Username</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-sm font-semibold text-gray-600">Email:</span>
+                            <span class="text-sm break-all">@user.Email</span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Roles:</span>
+                            <div class="mt-1">
                                 @foreach (var role in user.Roles)
                                 {
-                                    <span class="inline-block text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full border @GetBadgeClass(role)">
+                                    <span class="inline-block text-xs font-semibold mr-1 mb-1 px-2 py-1 rounded-full border @GetBadgeClass(role)">
                                         @role
                                     </span>
                                 }
-                            </td>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="hidden sm:block overflow-x-auto">
+                <table class="table-auto border-collapse border border-gray-400 w-full min-w-full">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Username</th>
+                            <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Email</th>
+                            <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Roles</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@user.Username</td>
+                                <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base break-all">@user.Email</td>
+                                <td class="border border-gray-300 px-2 sm:px-4 py-2">
+                                    @foreach (var role in user.Roles)
+                                    {
+                                        <span class="inline-block text-xs font-semibold mr-1 mb-1 px-2 py-1 rounded-full border @GetBadgeClass(role)">
+                                            @role
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

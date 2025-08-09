@@ -1,36 +1,61 @@
 ﻿@page
 @model BookingSystem.Areas.Identity.Pages.Account.Manage.MyPropertiesModel
-
 @{
     ViewData["Title"] = "List Properties";
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
 }
-
-<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-xl min-w-lg mx-auto">
+<div class="min-h-screen bg-gray-50 py-12 px-2 sm:px-4 lg:px-8">
+    <div class="max-w-full sm:max-w-6xl mx-auto">
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">List of all my properties</h2>
-            <table class="table-auto border-collapse border border-gray-400 w-full">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="border border-gray-400 px-4 py-2">Title</th>
-                        <th class="border border-gray-400 px-4 py-2">Price</th>
-                        <th class="border border-gray-400 px-4 py-2">Location</th>
-                        <th class="border border-gray-400 px-4 py-2">Number of Guest</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var property in Model.Properties)
-                    {
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">List of all my properties</h2>
+
+            <div class="block sm:hidden space-y-4">
+                @foreach (var property in Model.Properties)
+                {
+                    <div class="bg-white rounded-lg border border-gray-300 p-4 shadow-sm text-left">
+                        <div class="mb-2">
+                            <span class="text-sm font-semibold text-gray-600">Title:</span>
+                            <span class="text-sm">@property.Title</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-sm font-semibold text-gray-600">Price:</span>
+                            <span class="text-sm">@property.Price</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-sm font-semibold text-gray-600">Location:</span>
+                            <span class="text-sm">@property.Town, @property.Country</span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Guests:</span>
+                            <span class="text-sm">@property.GuestNbr</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="hidden sm:block overflow-x-auto">
+                <table class="table-auto border-collapse border border-gray-400 w-full">
+                    <thead class="bg-gray-200">
                         <tr>
-                            <td class="border border-gray-300 px-4 py-2">@property.Title</td>
-                            <td class="border border-gray-300 px-4 py-2">@property.Price</td>
-                            <td class="border border-gray-300 px-4 py-2">@property.Town, @property.Country</td>
-                            <td class="border border-gray-300 px-4 py-2">@property.GuestNbr</td>
+                            <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Title</th>
+                            <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Price</th>
+                            <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Location</th>
+                            <th class="border border-gray-400 px-2 sm:px-4 py-2 text-sm sm:text-base">Guests</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var property in Model.Properties)
+                        {
+                            <tr>
+                                <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@property.Title</td>
+                                <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@property.Price</td>
+                                <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base">@property.Town, @property.Country</td>
+                                <td class="border border-gray-300 px-2 sm:px-4 py-2 text-sm sm:text-base text-center">@property.GuestNbr</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
