@@ -146,8 +146,8 @@ namespace BookingSystem.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
-                var startDate = DateTime.Parse(startStr).Date.AddHours(16);
-                var endDate = DateTime.Parse(endStr).Date.AddHours(11);
+                var startDate = DateTime.SpecifyKind(DateTime.Parse(startStr).Date.AddHours(16), DateTimeKind.Utc);
+                var endDate = DateTime.SpecifyKind(DateTime.Parse(endStr).Date.AddHours(11), DateTimeKind.Utc);
 
                 var isStillAvailable = await CheckAvailability(propertyId.Value, startDate, endDate);
                 if (!isStillAvailable)
