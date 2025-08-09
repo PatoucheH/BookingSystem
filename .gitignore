@@ -10,7 +10,7 @@ Debug/
 Release/
 
 # wwwroot (si fichiers générés automatiquement)
-wwwroot/css/
+wwwroot/css/input.css
 wwwroot/dist/
 wwwroot/build/
 wwwroot/node_modules/
