@@ -120,7 +120,7 @@ namespace BookingSystem.Controllers
             {
                 _logger.LogError(ex, "Error creating Stripe checkout session");
                 Console.WriteLine("Stripe error: " + ex.Message);
-                return StatusCode(500, "Error in the payment's session creating");
+                return StatusCode(500, $"Error in the payment's session creating {ex.ToString()}");
             }
         }
 
