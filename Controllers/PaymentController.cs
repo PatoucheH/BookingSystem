@@ -196,7 +196,7 @@ namespace BookingSystem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing successful payment");
-                TempData["Error"] = "Error during the reservation.";
+                TempData["Error"] = $"Error during the reservation. { ex.Message}";
                 return RedirectToAction("Index", "Home");
             }
         }
