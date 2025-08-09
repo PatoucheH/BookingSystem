@@ -40,17 +40,23 @@ namespace BookingSystem.Controllers
             Console.WriteLine("Call the method");
             try
             {
+                if (startDate.Kind == DateTimeKind.Unspecified)
+                    startDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+                else if (startDate.Kind == DateTimeKind.Local)
+                    startDate = startDate.ToUniversalTime();
+
+                if (endDate.Kind == DateTimeKind.Unspecified)
+                    endDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+                else if (endDate.Kind == DateTimeKind.Local)
+                    endDate = endDate.ToUniversalTime();
+
+
                 _logger.LogInformation($"Stripe API Key: {Stripe.StripeConfiguration.ApiKey?.Substring(0, 15)}...");
 
                 if (string.IsNullOrEmpty(productName) || amount <= 0 || propertyId <= 0)
                 {
                     _logger.LogWarning("Validation failed !");
                     return BadRequest("Data not good");
-                }
-                if (string.IsNullOrEmpty(productName) || amount <= 0 || propertyId <= 0)
-                {
-                    _logger.LogWarning("Invalid data received for checkout session");
-                    return BadRequest("Data not correct");
                 }
 
                 var property = await _context.Properties.FindAsync(propertyId);
@@ -60,7 +66,7 @@ namespace BookingSystem.Controllers
                     return NotFound("Property not find ");
                 }
 
-                if (startDate >= endDate || startDate < DateTime.Today)
+                if (startDate >= endDate || startDate < DateTime.UtcNow.Date)
                 {
                     _logger.LogWarning($"Invalid dates: {startDate} - {endDate}");
                     return BadRequest("Dates unavailable");
