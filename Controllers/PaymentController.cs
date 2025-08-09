@@ -45,7 +45,7 @@ namespace BookingSystem.Controllers
                 if (string.IsNullOrEmpty(productName) || amount <= 0 || propertyId <= 0)
                 {
                     _logger.LogWarning("Validation failed !");
-                    return BadRequest("Données invalides");
+                    return BadRequest("Data not good");
                 }
                 if (string.IsNullOrEmpty(productName) || amount <= 0 || propertyId <= 0)
                 {
@@ -119,6 +119,7 @@ namespace BookingSystem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating Stripe checkout session");
+                Console.WriteLine("Stripe error: " + ex.Message);
                 return StatusCode(500, "Error in the payment's session creating");
             }
         }
@@ -135,7 +136,7 @@ namespace BookingSystem.Controllers
                 if (propertyId == null || startStr == null || endStr == null)
                 {
                     _logger.LogWarning("Missing session data for booking confirmation");
-                    TempData["Error"] = "Impossible de confirmer la réservation.";
+                    TempData["Error"] = "Impossible to confirm reservation.";
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -146,7 +147,7 @@ namespace BookingSystem.Controllers
                 if (!isStillAvailable)
                 {
                     _logger.LogWarning($"Property {propertyId} no longer available after payment");
-                    TempData["Error"] = "Les dates ont été réservées entre-temps.";
+                    TempData["Error"] = "the date are not available yet.";
                     return RedirectToAction("Details", "Property", new { id = propertyId });
                 }
 
@@ -154,7 +155,7 @@ namespace BookingSystem.Controllers
                 if (string.IsNullOrEmpty(userId))
                 {
                     _logger.LogWarning("User not authenticated for booking");
-                    TempData["Error"] = "Utilisateur non authentifié.";
+                    TempData["Error"] = "Utilisateur no authentificate.";
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -183,13 +184,13 @@ namespace BookingSystem.Controllers
 
                 _logger.LogInformation($"Booking created successfully: {booking.Id}");
 
-                TempData["Success"] = "Paiement réussi. Réservation confirmée.";
+                TempData["Success"] = "Payment success. Reservation confirmed.";
                 return RedirectToAction("Details", "Property", new { id = propertyId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing successful payment");
-                TempData["Error"] = "Erreur lors de la confirmation de la réservation.";
+                TempData["Error"] = "Error during the reservation.";
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -201,7 +202,7 @@ namespace BookingSystem.Controllers
             HttpContext.Session.Remove("StartDate");
             HttpContext.Session.Remove("EndDate");
 
-            TempData["Info"] = "Paiement annulé.";
+            TempData["Info"] = "Payment canceled.";
             return RedirectToAction("Index", "Home");
         }
 
