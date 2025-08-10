@@ -40,7 +40,7 @@
     <div class="mb-2 flex flex-row items-center space-x-4 justify-evenly">
         <p class="mb-0">Ratings : @Model.Property.AverageRating.ToString() / 5</p>
 
-        <form method="post" asp-action="Rate" class="flex flex-row items-center space-x-2">
+        <form method="post" asp-action="Rate" class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
             <input type="hidden" name="propertyId" value="@Model.Property.Id" />
             <input type="hidden" id="rating-value" name="value" value="0" />
 
@@ -62,10 +62,10 @@
                    id="rating-message"
                    name="message"
                    placeholder="Write your message for the owner"
-                   class="p-2 border rounded w-64" />
+                   class="p-2 border rounded w-full sm:w-64" />
 
             <button type="submit"
-                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded whitespace-nowrap">
                 Rate my property
             </button>
         </form>
