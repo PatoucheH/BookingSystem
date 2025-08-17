@@ -31,7 +31,7 @@
                                 <span class="text-sm font-semibold text-gray-600">Status:</span>
                                 @if (booking.StartDate > DateTime.Now)
                                 {
-                                    <span class="text-green-600 font-semibold text-sm">Incoming</span>
+                                    <span class="text-teal-600 font-semibold text-sm">Incoming</span>
                                 }
                                 else if (booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
                                 {
@@ -68,7 +68,7 @@
                                     <td class="border border-gray-300 px-2 sm:px-4 py-2 text-center">
                                         @if (booking.StartDate > DateTime.Now)
                                         {
-                                            <span class="text-green-600 font-semibold text-sm">Incoming</span>
+                                            <span class="text-teal-600 font-semibold text-sm">Incoming</span>
                                         }
                                         else if (booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
                                         {
