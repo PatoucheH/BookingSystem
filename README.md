@@ -104,10 +104,6 @@ BookingSystem/
 4. Push to the branch (`git push origin feature/new-feature`)
 5. Create a Pull Request
 
-## License
-
-This project is available under the MIT License. See the LICENSE file for more details.
-
 ## Contact
 
 For questions or support, please open an issue on the GitHub repository.
